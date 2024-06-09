@@ -103,7 +103,11 @@ pushd kernel/
 popd
 
 # stash parts we need
-mv -v "kernel/out/mixed/dist" "./kernel-out"
+if [ "${ROM_TARGET}" == "shusky" ]; then
+  mv -v "kernel/out/shusky/dist" "./kernel-out"
+else
+  mv -v "kernel/out/mixed/dist" "./kernel-out"
+fi
 
 # remove kernel sources to save space before rom clone
 rm -rf kernel/
