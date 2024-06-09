@@ -77,8 +77,13 @@ pushd kernel/
     # apply kernelsu
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
-    # apply susfs (breaks kernel - need to investigate)
-    #patch -p1 < ../../patches/susfs_5_10.patch
+    # apply susfs (to KernelSU)
+    pushd KernelSU/
+      git am ../../../patches/KernelSU/*.patch
+    popd
+
+    # apply susfs (to kernel itself)
+    git am ../../patches/kernel-5.10/*.patch
   popd
 
   # build kernel
