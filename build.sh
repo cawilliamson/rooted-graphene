@@ -5,9 +5,8 @@ set -e
 ### VARIABLES
 
 AVBROOT_VERSION="3.2.2"
-GRAPHENE_RELEASE="2024060500"
 ROM_TARGET="felix"
-export AVBROOT_VERSION GRAPHENE_RELEASE ROM_TARGET
+export AVBROOT_VERSION ROM_TARGET
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rf kernel/ rom/
@@ -26,6 +25,7 @@ apt install -y \
   expect \
   git \
   git-lfs \
+  jq \
   openjdk-21-jdk-headless \
   python3 \
   python3-googleapi \
@@ -35,6 +35,10 @@ apt install -y \
   unzip \
   yarnpkg \
   zip
+
+### FETCH LATEST GRAPHENE TAG
+GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_${ROM_TARGET}/tags" | jq -r '.[0].name')
+export GRAPHENE_RELEASE
 
 # install repo command
 curl -s https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
