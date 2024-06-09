@@ -5,30 +5,12 @@ set arg1 [lindex $argv 0]
 set timeout -1
 spawn script/release.sh $arg1
 match_max 100000
-expect -exact "Enter key passphrase (empty if none): "
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for releasekey.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for platform.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for shared.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for media.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for networkstack.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for bluetooth.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for sdk_sandbox.pk8:"
-send -- "\r"
-expect -exact "\r
-Enter pass phrase for avb.pem:"
-send -- "\r"
-expect eof
+
+# Loop to handle multiple passphrase prompts
+expect {
+    -re ".*pass ?phrase.*" {
+        send -- "\r"
+        exp_continue
+    }
+    eof
+}
