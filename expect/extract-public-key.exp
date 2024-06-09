@@ -1,0 +1,7 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn ../../external/avb/avbtool.py extract_public_key --key avb.pem --output avb_pkmd.bin
+expect -exact "Enter pass phrase for avb.pem:"
+send -- "\r"
+expect eof
