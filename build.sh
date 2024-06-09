@@ -145,7 +145,7 @@ pushd rom/
     printf "\n" | ../../development/tools/make_key sdk_sandbox "/CN=$CN/" || true
     printf "\n" | ../../development/tools/make_key bluetooth "/CN=$CN/" || true
     openssl genrsa 4096 | openssl pkcs8 -topk8 -scrypt -out avb.pem -passout pass:""
-    avbroot key extract-avb -k avb.pem -o avb_pkmd.bin --pass
+    expect ../../../expect/extract-public-key.exp
     ssh-keygen -t ed25519 -f id_ed25519 -N ""
   popd
 
