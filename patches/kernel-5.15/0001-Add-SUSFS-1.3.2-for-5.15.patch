@@ -4,8 +4,6 @@ Date: Sun, 9 Jun 2024 23:04:41 +0100
 Subject: [PATCH] Add SUSFS 1.3.2 for 5.15
 
 ---
- drivers/Kconfig       |    1 +
- drivers/Makefile      |    2 +
  fs/Makefile           |    9 +-
  fs/namei.c            |  102 +++++
  fs/open.c             |   46 ++
@@ -18,30 +16,10 @@ Subject: [PATCH] Add SUSFS 1.3.2 for 5.15
  include/linux/mount.h |    4 +
  include/linux/susfs.h |  173 +++++++
  kernel/sys.c          |    9 +
- 14 files changed, 1420 insertions(+), 3 deletions(-)
+ 12 files changed, 1417 insertions(+), 3 deletions(-)
  create mode 100644 fs/susfs.c
  create mode 100644 include/linux/susfs.h
 
-diff --git a/drivers/Kconfig b/drivers/Kconfig
-index 67f447167..ac8973af7 100644
---- a/drivers/Kconfig
-+++ b/drivers/Kconfig
-@@ -238,4 +238,5 @@ source "drivers/interconnect/Kconfig"
- source "drivers/counter/Kconfig"
- 
- source "drivers/most/Kconfig"
-+source "drivers/kernelsu/Kconfig"
- endmenu
-diff --git a/drivers/Makefile b/drivers/Makefile
-index 2d5fcb5cc..28cb9abf2 100644
---- a/drivers/Makefile
-+++ b/drivers/Makefile
-@@ -188,3 +188,5 @@ obj-$(CONFIG_GNSS)		+= gnss/
- obj-$(CONFIG_INTERCONNECT)	+= interconnect/
- obj-$(CONFIG_COUNTER)		+= counter/
- obj-$(CONFIG_MOST)		+= most/
-+
-+obj-$(CONFIG_KSU) += kernelsu/
 diff --git a/fs/Makefile b/fs/Makefile
 index e4adb9882..f06abf137 100644
 --- a/fs/Makefile
