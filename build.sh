@@ -26,6 +26,7 @@ apt install -y \
   git \
   git-lfs \
   jq \
+  libssl-dev \
   openjdk-21-jdk-headless \
   python3 \
   python3-googleapi \

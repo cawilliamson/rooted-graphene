@@ -1,17 +1,17 @@
-From d50347279d9e425c20f71a83b0683594d9e4ca2c Mon Sep 17 00:00:00 2001
+From 9339e6c1cf1c0ef397192adab87117e1c478e4b4 Mon Sep 17 00:00:00 2001
 From: Android Build <androidbuild@localhost>
-Date: Sun, 9 Jun 2024 12:49:04 +0100
-Subject: [PATCH] Add SUSFS to KernelSU
+Date: Sun, 9 Jun 2024 23:05:53 +0100
+Subject: [PATCH] Add SUSFS 1.3.2 for KernelSU
 
 ---
  kernel/Kconfig         |   6 ++
- kernel/Makefile        |  18 +++++
+ kernel/Makefile        |   8 ++
  kernel/core_hook.c     | 168 +++++++++++++++++++++++++++++++++++++++++
  kernel/kernel_compat.c |  10 +++
  kernel/kernel_compat.h |   1 +
  kernel/ksu.c           |   8 ++
  kernel/selinux/rules.c |   5 ++
- 7 files changed, 216 insertions(+)
+ 7 files changed, 206 insertions(+)
 
 diff --git a/kernel/Kconfig b/kernel/Kconfig
 index 67f177f4..100510bb 100644
@@ -29,10 +29,10 @@ index 67f177f4..100510bb 100644
 +      Patch SUSFS to kernel and KernelSU
  endmenu
 diff --git a/kernel/Makefile b/kernel/Makefile
-index 9fec3ef3..3ec12911 100644
+index 9fec3ef3..7fe57d9a 100644
 --- a/kernel/Makefile
 +++ b/kernel/Makefile
-@@ -51,4 +51,22 @@ ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"
+@@ -51,4 +51,12 @@ ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"
  ccflags-y += -Wno-implicit-function-declaration -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat
  ccflags-y += -Wno-declaration-after-statement -Wno-unused-function
  
@@ -44,19 +44,9 @@ index 9fec3ef3..3ec12911 100644
 +$(info -- Read: https://gitlab.com/simonpunk/susfs4ksu)
 +endif
 +
-+ccflags-y += -DKSU_SUSFS
-+
-+ifeq ($(shell test -e $(srctree)/fs/susfs.c; echo $$?),0)
-+ccflags-y += -DKSU_SUSFS
-+$(info -- KSU_SUSFS is enabled.)
-+else
-+$(info -- You have not integrate susfs in your kernel.)
-+$(info -- Read: https://gitlab.com/simonpunk/susfs4ksu)
-+endif
-+
  # Keep a new line here!! Because someone may append config
 diff --git a/kernel/core_hook.c b/kernel/core_hook.c
-index b63ea0b1..ae4e9958 100644
+index b63ea0b1..7c25150d 100644
 --- a/kernel/core_hook.c
 +++ b/kernel/core_hook.c
 @@ -44,6 +44,10 @@
@@ -88,7 +78,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_path((struct st_susfs_sus_path __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_PATH -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_ADD_SUS_MOUNT) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_mount))) {
@@ -101,7 +91,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_mount((struct st_susfs_sus_mount __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_MOUNT -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_ADD_SUS_KSTAT) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_kstat))) {
@@ -114,7 +104,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_kstat((struct st_susfs_sus_kstat __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_KSTAT -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_UPDATE_SUS_KSTAT) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_kstat))) {
@@ -127,7 +117,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_update_sus_kstat((struct st_susfs_sus_kstat __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_UPDATE_SUS_KSTAT -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_ADD_SUS_KSTAT_STATICALLY) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_kstat))) {
@@ -140,7 +130,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_kstat((struct st_susfs_sus_kstat __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_KSTAT_STATICALLY -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +        } else if (arg2 == CMD_SUSFS_ADD_SUS_MAPS) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_maps))) {
@@ -153,7 +143,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_maps((struct st_susfs_sus_maps __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_MAPS -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_UPDATE_SUS_MAPS) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_maps))) {
@@ -166,7 +156,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_update_sus_maps((struct st_susfs_sus_maps __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_UPDATE_SUS_MAPS -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +        } else if (arg2 == CMD_SUSFS_ADD_SUS_MAPS_STATICALLY) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_maps))) {
@@ -179,7 +169,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_maps((struct st_susfs_sus_maps __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_MAPS_STATICALLY -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_ADD_SUS_PROC_FD_LINK) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_sus_proc_fd_link))) {
@@ -192,7 +182,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_sus_proc_fd_link((struct st_susfs_sus_proc_fd_link __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_SUS_PROC_FD_LINK -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_ADD_TRY_UMOUNT) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_try_umount))) {
@@ -205,7 +195,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_add_try_umount((struct st_susfs_try_umount __user*)arg3);
 +            pr_info("susfs: CMD_SUSFS_ADD_TRY_UMOUNT -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_SET_UNAME) {
 +			if (!ksu_access_ok((void __user*)arg3, sizeof(struct st_susfs_uname))) {
@@ -218,7 +208,7 @@ index b63ea0b1..ae4e9958 100644
 +			}
 +			error = susfs_set_uname((struct st_susfs_uname __user*)arg3);
 +			pr_info("susfs: CMD_SUSFS_SET_UNAME -> ret: %d\n", error);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		} else if (arg2 == CMD_SUSFS_ENABLE_LOG) {
 +			if (arg3 != 0 && arg3 != 1) {
@@ -226,7 +216,7 @@ index b63ea0b1..ae4e9958 100644
 +                return 0;
 +			}
 +			susfs_set_log(arg3);
-+            copy_to_user((void __user*)arg5, &error, sizeof(error));
++            (void)copy_to_user((void __user*)arg5, &error, sizeof(error));
 +			return 0;
 +		}
 +        return 0;
@@ -325,3 +315,4 @@ index b4e6eae0..c597ef8c 100644
  
 -- 
 2.43.0
+
