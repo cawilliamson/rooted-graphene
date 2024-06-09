@@ -5,7 +5,7 @@ set -e
 ### VARIABLES
 
 AVBROOT_VERSION="3.2.2"
-ROM_TARGET="felix"
+ROM_TARGET="husky"
 export AVBROOT_VERSION ROM_TARGET
 
 ### CLEANUP PREVIOUS BUILDS
@@ -72,9 +72,12 @@ popd
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
+  if [ "${ROM_TARGET}" == "husky" ]; then
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
+  else
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
+  fi
   repo sync -j4 # limit to 4 to avoid throttling
-  while [ $? -ne 0 ]; do !!; done # just incase - retry until success
 
   # fetch & apply ksu and susfs patches
   pushd aosp/
@@ -108,7 +111,6 @@ pushd rom/
   # sync rom sources
   repo init -u https://github.com/GrapheneOS/platform_manifest.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   repo sync -j4 # limit to 4 to avoid throttling
-  while [ $? -ne 0 ]; do !!; done # just incase - retry until success
 
   # copy kernel sources
   cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET}-kernel/"
@@ -138,7 +140,7 @@ pushd rom/
     printf "\n" | ../../development/tools/make_key sdk_sandbox "/CN=$CN/" || true
     printf "\n" | ../../development/tools/make_key bluetooth "/CN=$CN/" || true
     openssl genrsa 4096 | openssl pkcs8 -topk8 -scrypt -out avb.pem -passout pass:""
-    expect ../../../expect/extract-public-key.exp
+    avbroot key extract-avb -k avb.pem -o avb_pkmd.bin --pass
     ssh-keygen -t ed25519 -f id_ed25519 -N ""
   popd
 
