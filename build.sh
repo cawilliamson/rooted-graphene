@@ -130,24 +130,24 @@ pushd rom/
   pushd "keys/${ROM_TARGET}/"
     # generate and sign
     CN=GrapheneOS
-    printf "\n" | ../../development/tools/make_key releasekey "/CN=$CN/"
-    printf "\n" | ../../development/tools/make_key platform "/CN=$CN/"
-    printf "\n" | ../../development/tools/make_key shared "/CN=$CN/"
-    printf "\n" | ../../development/tools/make_key media "/CN=$CN/"
-    printf "\n" | ../../development/tools/make_key networkstack "/CN=$CN/"
-    printf "\n" | ../../development/tools/make_key sdk_sandbox "/CN=$CN/"
-    printf "\n" | ../../development/tools/make_key bluetooth "/CN=$CN/"
+    printf "\n" | ../../development/tools/make_key releasekey "/CN=$CN/" || true
+    printf "\n" | ../../development/tools/make_key platform "/CN=$CN/" || true
+    printf "\n" | ../../development/tools/make_key shared "/CN=$CN/" || true
+    printf "\n" | ../../development/tools/make_key media "/CN=$CN/" || true
+    printf "\n" | ../../development/tools/make_key networkstack "/CN=$CN/" || true
+    printf "\n" | ../../development/tools/make_key sdk_sandbox "/CN=$CN/" || true
+    printf "\n" | ../../development/tools/make_key bluetooth "/CN=$CN/" || true
     openssl genrsa 4096 | openssl pkcs8 -topk8 -scrypt -out avb.pem -passout pass:""
     expect ../../../expect/extract-public-key.exp
     ssh-keygen -t ed25519 -f id_ed25519 -N ""
   popd
 
   # encrypt keys
-  expect ../expect/encrypt-keys.exp felix
+  expect ../expect/encrypt-keys.exp "${ROM_TARGET}"
 
   # generate ota package
   m otatools-package
 
   # build release
-  expect ../expect/release.exp felix
+  expect ../expect/release.exp "${ROM_TARGET}"
 popd
