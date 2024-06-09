@@ -90,7 +90,11 @@ pushd kernel/
     popd
 
     # apply susfs (to kernel itself)
-    git am ../../patches/kernel-5.10/*.patch
+    if [ "${ROM_TARGET}" == "husky" ]; then
+      git am ../../patches/kernel-5.15/*.patch
+    else
+      git am ../../patches/kernel-5.10/*.patch
+    fi
   popd
 
   # build kernel
