@@ -5,7 +5,7 @@ set -e
 ### VARIABLES
 
 AVBROOT_VERSION="3.2.2"
-ROM_TARGET="husky"
+ROM_TARGET="shusky"
 export AVBROOT_VERSION ROM_TARGET
 
 ### CLEANUP PREVIOUS BUILDS
@@ -72,7 +72,7 @@ popd
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "husky" ]; then
+  if [ "${ROM_TARGET}" == "shusky" ]; then
     repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
@@ -90,7 +90,7 @@ pushd kernel/
     popd
 
     # apply susfs (to kernel itself)
-    if [ "${ROM_TARGET}" == "husky" ]; then
+    if [ "${ROM_TARGET}" == "shusky" ]; then
       git am ../../patches/kernel-5.15/*.patch
     else
       git am ../../patches/kernel-5.10/*.patch
