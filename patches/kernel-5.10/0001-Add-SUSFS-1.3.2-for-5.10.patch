@@ -4,8 +4,6 @@ Date: Sun, 9 Jun 2024 14:41:11 +0100
 Subject: [PATCH] Add SUSFS 1.3.2 for 5.10
 
 ---
- drivers/Kconfig       |    1 +
- drivers/Makefile      |    2 +
  fs/Makefile           |    9 +-
  fs/namei.c            |  116 +++++
  fs/open.c             |   46 ++
@@ -18,30 +16,10 @@ Subject: [PATCH] Add SUSFS 1.3.2 for 5.10
  include/linux/mount.h |    4 +
  include/linux/susfs.h |  173 +++++++
  kernel/sys.c          |    9 +
- 14 files changed, 1434 insertions(+), 3 deletions(-)
+ 12 files changed, 1431 insertions(+), 3 deletions(-)
  create mode 100644 fs/susfs.c
  create mode 100644 include/linux/susfs.h
 
-diff --git a/drivers/Kconfig b/drivers/Kconfig
-index dcecc9f6e..8cae523c9 100644
---- a/drivers/Kconfig
-+++ b/drivers/Kconfig
-@@ -235,4 +235,5 @@ source "drivers/interconnect/Kconfig"
- source "drivers/counter/Kconfig"
- 
- source "drivers/most/Kconfig"
-+source "drivers/kernelsu/Kconfig"
- endmenu
-diff --git a/drivers/Makefile b/drivers/Makefile
-index 576228037..4e218bf03 100644
---- a/drivers/Makefile
-+++ b/drivers/Makefile
-@@ -189,3 +189,5 @@ obj-$(CONFIG_GNSS)		+= gnss/
- obj-$(CONFIG_INTERCONNECT)	+= interconnect/
- obj-$(CONFIG_COUNTER)		+= counter/
- obj-$(CONFIG_MOST)		+= most/
-+
-+obj-$(CONFIG_KSU) += kernelsu/
 diff --git a/fs/Makefile b/fs/Makefile
 index c7851875b..671190d1d 100644
 --- a/fs/Makefile
@@ -682,10 +660,10 @@ index 000000000..989a48028
 +
 +	memcpy(&new_list->info, &info, sizeof(struct st_susfs_sus_kstat));
 +	/* Seems the dev number issue is finally solved, the userspace stat we see is already a encoded dev
-+	 * which is set by new_encode_dev() / huge_encode_dev() function for 64bit system and 
++	 * which is set by new_encode_dev() / huge_encode_dev() function for 64bit system and
 +	 * old_encode_dev() for 32bit only system, that's why we need to decode it in kernel as well,
 +	 * and different kernel may have different function to encode the dev number, be cautious!
-+	 * Also check your encode_dev() macro in fs/stat.c to determine which one to use 
++	 * Also check your encode_dev() macro in fs/stat.c to determine which one to use
 +	 */
 +#if defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64)
 +#ifdef CONFIG_MIPS
@@ -733,7 +711,7 @@ index 000000000..989a48028
 +    struct st_susfs_sus_maps_list *cursor, *temp;
 +    struct st_susfs_sus_maps_list *new_list = NULL;
 +	struct st_susfs_sus_maps info;
-+	
++
 +	if (copy_from_user(&info, user_info, sizeof(struct st_susfs_sus_maps))) {
 +		SUSFS_LOGE("failed copying from userspace\n");
 +		return 1;
@@ -1342,7 +1320,7 @@ index 000000000..989a48028
 +	if (check_mnt && !should_umount(&path)) {
 +		return;
 +	}
-+	
++
 +	umount_mnt(&path, flags);
 +}
 +
@@ -1352,11 +1330,11 @@ index 000000000..989a48028
 +	list_for_each_entry_safe(cursor, temp, &LH_TRY_UMOUNT_PATH, list) {
 +		SUSFS_LOGI("umounting '%s' for uid: %d\n", cursor->info.target_pathname, target_uid);
 +		if (cursor->info.mnt_mode == 0) {
-+        	try_umount(cursor->info.target_pathname, false, 0);
++		try_umount(cursor->info.target_pathname, false, 0);
 +		} else if (cursor->info.mnt_mode == 1) {
-+        	try_umount(cursor->info.target_pathname, false, MNT_DETACH);
++		try_umount(cursor->info.target_pathname, false, MNT_DETACH);
 +		}
-+    }
++	}
 +}
 +
 +void susfs_spoof_uname(struct new_utsname* tmp) {
