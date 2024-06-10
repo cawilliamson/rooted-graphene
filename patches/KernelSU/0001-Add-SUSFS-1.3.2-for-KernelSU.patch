@@ -22,11 +22,11 @@ index 67f177f4..100510bb 100644
  	  Enable KernelSU debug mode.
  
 +config KSU_SUSFS
-+    bool "KernelSU addon - SUSFS"
-+    depends on KSU
-+    default y
-+    help
-+      Patch SUSFS to kernel and KernelSU
++	bool "KernelSU addon - SUSFS"
++	depends on KSU
++	default y
++	help
++	  Patch SUSFS to kernel and KernelSU
  endmenu
 diff --git a/kernel/Makefile b/kernel/Makefile
 index 9fec3ef3..7fe57d9a 100644
