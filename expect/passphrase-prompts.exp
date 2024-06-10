@@ -3,7 +3,7 @@
 set arg1 [lindex $argv 0]
 
 set timeout -1
-spawn script/release.sh $arg1
+spawn $arg1
 match_max 100000
 
 # Loop to handle multiple passphrase prompts

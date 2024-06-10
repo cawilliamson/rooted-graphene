@@ -157,16 +157,16 @@ pushd rom/
     printf "\n" | ../../development/tools/make_key sdk_sandbox "/CN=$CN/" || true
     printf "\n" | ../../development/tools/make_key bluetooth "/CN=$CN/" || true
     openssl genrsa 4096 | openssl pkcs8 -topk8 -scrypt -out avb.pem -passout pass:""
-    expect ../../../expect/extract-public-key.exp
+    expect ../../../expect/passphrase-prompts.exp "../../external/avb/avbtool.py extract_public_key --key avb.pem --output avb_pkmd.bin"
     ssh-keygen -t ed25519 -f id_ed25519 -N ""
   popd
 
   # encrypt keys
-  expect ../expect/encrypt-keys.exp "${ROM_TARGET}"
+  expect ../expect/passphrase-prompts.exp "./script/encrypt_keys.sh ./keys/${ROM_TARGET}"
 
   # generate ota package
   m otatools-package
 
   # build release
-  expect ../expect/release.exp "${ROM_TARGET}"
+  expect ../expect/passphrase-prompts.exp "script/release.sh ${ROM_TARGET}"
 popd
