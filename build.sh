@@ -4,9 +4,17 @@ set -e
 
 ### VARIABLES
 
+# set static variables
 AVBROOT_VERSION="3.2.2"
 ROM_TARGET="husky"
-export AVBROOT_VERSION ROM_TARGET
+
+# determine rom target code
+if [ "${ROM_TARGET}" == "husky" ]; then
+  ROM_TARGET_GROUP="shusky"
+else
+  ROM_TARGET_GROUP="${ROM_TARGET}"
+fi
+export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rf kernel/ rom/
@@ -38,11 +46,7 @@ apt install -y \
   zip
 
 ### FETCH LATEST GRAPHENE TAG
-if [ "${ROM_TARGET}" == "husky" ]; then
-  GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_shusky/tags" | jq -r '.[0].name')
-else
-  GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_${ROM_TARGET}/tags" | jq -r '.[0].name')
-fi
+GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_${ROM_TARGET_GROUP}/tags" | jq -r '.[0].name')
 export GRAPHENE_RELEASE
 
 # install repo command
@@ -103,11 +107,7 @@ pushd kernel/
   popd
 
   # build kernel
-  if [ "${ROM_TARGET}" == "husky" ]; then
-    BUILD_AOSP_KERNEL=1 LTO=full ./build_shusky.sh
-  else
-    BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET}.sh
-  fi
+  BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
 popd
 
 # stash parts we need
@@ -130,11 +130,7 @@ pushd rom/
   repo sync -j4 # limit to 4 to avoid throttling
 
   # copy kernel sources
-  if [ "${ROM_TARGET}" == "husky" ]; then
-    cp -Rfv ../kernel-out/* "device/google/shusky-kernel/"
-  else
-    cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET}-kernel/"
-  fi
+  cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET_GROUP}-kernel/"
   rm -rf ../kernel-out
 
   # fetch vendor binaries
