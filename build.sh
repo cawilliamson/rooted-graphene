@@ -5,7 +5,7 @@ set -e
 ### VARIABLES
 
 AVBROOT_VERSION="3.2.2"
-ROM_TARGET="shusky"
+ROM_TARGET="husky"
 export AVBROOT_VERSION ROM_TARGET
 
 ### CLEANUP PREVIOUS BUILDS
@@ -38,7 +38,11 @@ apt install -y \
   zip
 
 ### FETCH LATEST GRAPHENE TAG
-GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_${ROM_TARGET}/tags" | jq -r '.[0].name')
+if [ "${ROM_TARGET}" == "husky" ]; then
+  GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_shusky/tags" | jq -r '.[0].name')
+else
+  GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_${ROM_TARGET}/tags" | jq -r '.[0].name')
+fi
 export GRAPHENE_RELEASE
 
 # install repo command
@@ -73,7 +77,7 @@ popd
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "shusky" ]; then
+  if [ "${ROM_TARGET}" == "husky" ]; then
     repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
@@ -91,7 +95,7 @@ pushd kernel/
     popd
 
     # apply susfs (to kernel itself)
-    if [ "${ROM_TARGET}" == "shusky" ]; then
+    if [ "${ROM_TARGET}" == "husky" ]; then
       git am ../../patches/kernel-5.15/*.patch
     else
       git am ../../patches/kernel-5.10/*.patch
@@ -99,11 +103,15 @@ pushd kernel/
   popd
 
   # build kernel
-  BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET}.sh
+  if [ "${ROM_TARGET}" == "husky" ]; then
+    BUILD_AOSP_KERNEL=1 LTO=full ./build_shusky.sh
+  else
+    BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET}.sh
+  fi
 popd
 
 # stash parts we need
-if [ "${ROM_TARGET}" == "shusky" ]; then
+if [ "${ROM_TARGET}" == "husky" ]; then
   mv -v "kernel/out/shusky/dist" "./kernel-out"
 else
   mv -v "kernel/out/mixed/dist" "./kernel-out"
@@ -122,7 +130,11 @@ pushd rom/
   repo sync -j4 # limit to 4 to avoid throttling
 
   # copy kernel sources
-  cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET}-kernel/"
+  if [ "${ROM_TARGET}" == "husky" ]; then
+    cp -Rfv ../kernel-out/* "device/google/shusky-kernel/"
+  else
+    cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET}-kernel/"
+  fi
   rm -rf ../kernel-out
 
   # fetch vendor binaries
