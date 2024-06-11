@@ -1,6 +1,6 @@
-From b1ea98732cfd7838c69740fc4571b8a380729e40 Mon Sep 17 00:00:00 2001
+From c6afc7797918097be03435ebba9ab73ea721bb0c Mon Sep 17 00:00:00 2001
 From: Android Build <androidbuild@localhost>
-Date: Tue, 11 Jun 2024 23:27:28 +0100
+Date: Tue, 11 Jun 2024 23:53:02 +0100
 Subject: [PATCH] Add SUSFS 1.3.3 to Kernel 5.10
 
 ---
@@ -12,11 +12,11 @@ Subject: [PATCH] Add SUSFS 1.3.3 to Kernel 5.10
  fs/proc_namespace.c   |   38 ++
  fs/readdir.c          |   11 +
  fs/stat.c             |   15 +
- fs/susfs.c            | 1116 +++++++++++++++++++++++++++++++++++++++++
+ fs/susfs.c            | 1113 +++++++++++++++++++++++++++++++++++++++++
  include/linux/mount.h |    4 +
  include/linux/susfs.h |  189 +++++++
  kernel/sys.c          |    9 +
- 12 files changed, 1582 insertions(+), 3 deletions(-)
+ 12 files changed, 1579 insertions(+), 3 deletions(-)
  create mode 160000 KernelSU
  create mode 120000 drivers/kernelsu
  create mode 100644 fs/susfs.c
@@ -558,10 +558,10 @@ index c6a2e1098..e7257d1b1 100644
  
 diff --git a/fs/susfs.c b/fs/susfs.c
 new file mode 100644
-index 000000000..34171cb70
+index 000000000..b96185607
 --- /dev/null
 +++ b/fs/susfs.c
-@@ -0,0 +1,1116 @@
+@@ -0,0 +1,1113 @@
 +#include <linux/cred.h>
 +#include <linux/fs.h>
 +#include <linux/path.h>
@@ -1586,11 +1586,8 @@ index 000000000..34171cb70
 +        list_for_each_entry(sus_mount_cursor, &LH_SUS_MOUNT, list) {
 +            mnt_path.dentry = mnt->mnt.mnt_root;
 +            mnt_path.mnt = &mnt->mnt;
-+            if (path == NULL) {
-+                continue;
-+            }
 +            p_path = d_path(&mnt_path, path, SUSFS_MAX_LEN_PATHNAME);
-+            if (IS_ERR(p_path)) {
++            if (IS_ERR(p_path) || p_path == NULL) {
 +                continue;
 +            }
 +            end = mangle_path(path, p_path, " \t\n\\");
