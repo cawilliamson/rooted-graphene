@@ -1,7 +1,7 @@
-From f4a81d2c24858a3ed928f26c977eb3dec19e6ad2 Mon Sep 17 00:00:00 2001
+From b1ea98732cfd7838c69740fc4571b8a380729e40 Mon Sep 17 00:00:00 2001
 From: Android Build <androidbuild@localhost>
-Date: Sun, 9 Jun 2024 14:41:11 +0100
-Subject: [PATCH] Add SUSFS 1.3.2 for 5.10
+Date: Tue, 11 Jun 2024 23:27:28 +0100
+Subject: [PATCH] Add SUSFS 1.3.3 to Kernel 5.10
 
 ---
  fs/Makefile           |    9 +-
@@ -9,14 +9,16 @@ Subject: [PATCH] Add SUSFS 1.3.2 for 5.10
  fs/open.c             |   46 ++
  fs/proc/base.c        |    9 +
  fs/proc/task_mmu.c    |   23 +
- fs/proc_namespace.c   |   16 +
+ fs/proc_namespace.c   |   38 ++
  fs/readdir.c          |   11 +
  fs/stat.c             |   15 +
- fs/susfs.c            | 1003 +++++++++++++++++++++++++++++++++++++++++
+ fs/susfs.c            | 1116 +++++++++++++++++++++++++++++++++++++++++
  include/linux/mount.h |    4 +
- include/linux/susfs.h |  173 +++++++
+ include/linux/susfs.h |  189 +++++++
  kernel/sys.c          |    9 +
- 12 files changed, 1431 insertions(+), 3 deletions(-)
+ 12 files changed, 1582 insertions(+), 3 deletions(-)
+ create mode 160000 KernelSU
+ create mode 120000 drivers/kernelsu
  create mode 100644 fs/susfs.c
  create mode 100644 include/linux/susfs.h
 
@@ -400,7 +402,7 @@ index 7e70972b2..046f4fc93 100644
  	 * Print the dentry name for named mappings, and a
  	 * special [heap] marker for the heap:
 diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
-index eafb75755..66c92c824 100644
+index eafb75755..c214f5c5f 100644
 --- a/fs/proc_namespace.c
 +++ b/fs/proc_namespace.c
 @@ -18,6 +18,10 @@
@@ -425,18 +427,32 @@ index eafb75755..66c92c824 100644
  	if (sb->s_op->show_devname) {
  		err = sb->s_op->show_devname(m, mnt_path.dentry);
  		if (err)
-@@ -137,6 +145,10 @@ static int show_mountinfo(struct seq_file *m, struct vfsmount *mnt)
+@@ -137,8 +145,24 @@ static int show_mountinfo(struct seq_file *m, struct vfsmount *mnt)
  	struct path mnt_path = { .dentry = mnt->mnt_root, .mnt = mnt };
  	int err;
  
 +#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
++	int fake_mnt_id, fake_parent_mnt_id;
 +	if (susfs_sus_mount(mnt, &p->root)) return 0;
++
++	if (uid_matches_proc_need_to_reorder_mnt_id()) {
++		fake_mnt_id = susfs_get_fake_mnt_id(r->mnt_id);
++		fake_parent_mnt_id = susfs_get_fake_mnt_id(r->mnt_parent->mnt_id);
++		seq_printf(m, "%i %i %u:%u ", fake_mnt_id, fake_parent_mnt_id,
++			MAJOR(sb->s_dev), MINOR(sb->s_dev));
++		goto bypass_orig_flow;
++	}
 +#endif
 +
  	seq_printf(m, "%i %i %u:%u ", r->mnt_id, r->mnt_parent->mnt_id,
  		   MAJOR(sb->s_dev), MINOR(sb->s_dev));
++if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
++bypass_orig_flow:
++#endif
  	if (sb->s_op->show_path) {
-@@ -199,6 +211,10 @@ static int show_vfsstat(struct seq_file *m, struct vfsmount *mnt)
+ 		err = sb->s_op->show_path(m, mnt->mnt_root);
+ 		if (err)
+@@ -199,6 +223,10 @@ static int show_vfsstat(struct seq_file *m, struct vfsmount *mnt)
  	struct super_block *sb = mnt_path.dentry->d_sb;
  	int err;
  
@@ -447,6 +463,30 @@ index eafb75755..66c92c824 100644
  	/* device */
  	if (sb->s_op->show_devname) {
  		seq_puts(m, "device ");
+@@ -300,6 +328,11 @@ static int mounts_release(struct inode *inode, struct file *file)
+ 	path_put(&p->root);
+ 	mnt_cursor_del(p->ns, &p->cursor);
+ 	put_mnt_ns(p->ns);
++#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
++	if (uid_matches_proc_need_to_reorder_mnt_id()) {
++		susfs_remove_mnt_id_recorder();
++	}
++#endif
+ 	return seq_release_private(inode, file);
+ }
+ 
+@@ -310,6 +343,11 @@ static int mounts_open(struct inode *inode, struct file *file)
+ 
+ static int mountinfo_open(struct inode *inode, struct file *file)
+ {
++#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
++if (uid_matches_proc_need_to_reorder_mnt_id()) {
++	susfs_add_mnt_id_recorder();
++}
++#endif
+ 	return mounts_open_common(inode, file, show_mountinfo);
+ }
+ 
 diff --git a/fs/readdir.c b/fs/readdir.c
 index 09e8ed7d4..68439cf71 100644
 --- a/fs/readdir.c
@@ -518,17 +558,17 @@ index c6a2e1098..e7257d1b1 100644
  
 diff --git a/fs/susfs.c b/fs/susfs.c
 new file mode 100644
-index 000000000..989a48028
+index 000000000..34171cb70
 --- /dev/null
 +++ b/fs/susfs.c
-@@ -0,0 +1,1003 @@
+@@ -0,0 +1,1116 @@
 +#include <linux/cred.h>
 +#include <linux/fs.h>
 +#include <linux/path.h>
 +#include <linux/slab.h>
 +#include <linux/seq_file.h>
 +#include <linux/printk.h>
-+#include <linux/mount.h>
++#include <linux/dcache.h>
 +#include <linux/namei.h>
 +#include <linux/list.h>
 +#include <linux/init_task.h>
@@ -537,6 +577,7 @@ index 000000000..989a48028
 +#include <linux/uaccess.h>
 +#include <linux/version.h>
 +#include <linux/susfs.h>
++#include <mount.h>
 +
 +LIST_HEAD(LH_SUS_PATH);
 +LIST_HEAD(LH_KSTAT_SPOOFER);
@@ -544,13 +585,17 @@ index 000000000..989a48028
 +LIST_HEAD(LH_MAPS_SPOOFER);
 +LIST_HEAD(LH_SUS_PROC_FD_LINK);
 +LIST_HEAD(LH_TRY_UMOUNT_PATH);
++
++LIST_HEAD(LH_MOUNT_ID_RECORDER);
++
 +struct st_susfs_uname my_uname;
 +
 +spinlock_t susfs_spin_lock;
++spinlock_t susfs_mnt_id_recorder_spin_lock;
++
 +bool is_log_enable = true;
 +#define SUSFS_LOGI(fmt, ...) if (is_log_enable) pr_info("susfs: " fmt, ##__VA_ARGS__)
 +#define SUSFS_LOGE(fmt, ...) if (is_log_enable) pr_err("susfs: " fmt, ##__VA_ARGS__)
-+
 +
 +int susfs_add_sus_path(struct st_susfs_sus_path* __user user_info) {
 +    struct st_susfs_sus_path_list *cursor, *temp;
@@ -588,46 +633,41 @@ index 000000000..989a48028
 +int susfs_add_sus_mount(struct st_susfs_sus_mount* __user user_info) {
 +    struct st_susfs_sus_mount_list *cursor, *temp;
 +    struct st_susfs_sus_mount_list *new_list = NULL;
-+	struct st_susfs_sus_mount info;
-+	unsigned long encoded_target_dev;
++    struct st_susfs_sus_mount info;
 +
-+	if (copy_from_user(&info, user_info, sizeof(struct st_susfs_sus_mount))) {
-+		SUSFS_LOGE("failed copying from userspace\n");
-+		return 1;
-+	}
-+#if defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64)
-+#ifdef CONFIG_MIPS
-+	encoded_target_dev = new_decode_dev(info.target_dev);
-+#else
-+	encoded_target_dev = huge_decode_dev(info.target_dev);
-+#endif /* CONFIG_MIPS */
-+#else /* defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64) */
-+	encoded_target_dev = old_decode_dev(info.target_dev);
-+#endif /* defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64) */
++    int list_count = 0;
++
++    if (copy_from_user(&info, user_info, sizeof(struct st_susfs_sus_mount))) {
++        SUSFS_LOGE("failed copying from userspace\n");
++        return 1;
++    }
 +
 +    list_for_each_entry_safe(cursor, temp, &LH_SUS_MOUNT, list) {
-+        if (cursor->info.target_dev == encoded_target_dev &&
-+		    !strcmp(cursor->info.target_pathname, info.target_pathname)) {
-+		//if (info.target_dev == cursor->info.target_dev) {
-+            SUSFS_LOGE("target_dev: '0x%x', target_pathname: '%s' is already created in LH_SUS_MOUNT\n", cursor->info.target_dev, cursor->info.target_pathname);
++        if (!strcmp(cursor->info.target_pathname, info.target_pathname)) {
++            SUSFS_LOGE("target_pathname: '%s' is already created in LH_SUS_MOUNT\n", cursor->info.target_pathname);
 +            return 1;
 +        }
++        list_count += 1;
++    }
++
++    if (list_count == SUSFS_MAX_SUS_MNTS) {
++        SUSFS_LOGE("LH_SUS_MOUNT has reached the list limit of %d\n", SUSFS_MAX_SUS_MNTS);
++        return 1;
 +    }
 +
 +    new_list = kmalloc(sizeof(struct st_susfs_sus_mount_list), GFP_KERNEL);
 +    if (!new_list) {
-+		SUSFS_LOGE("No enough memory\n");
-+		return 1;
-+	}
++        SUSFS_LOGE("No enough memory\n");
++        return 1;
++    }
 +
-+	memcpy(&new_list->info, &info, sizeof(struct st_susfs_sus_mount));
-+	new_list->info.target_dev = encoded_target_dev;
++    memcpy(&new_list->info, &info, sizeof(struct st_susfs_sus_mount));
 +
 +    INIT_LIST_HEAD(&new_list->list);
 +    spin_lock(&susfs_spin_lock);
 +    list_add_tail(&new_list->list, &LH_SUS_MOUNT);
 +    spin_unlock(&susfs_spin_lock);
-+    SUSFS_LOGI("target_dev: '0x%x', target_pathname: '%s', is successfully added to LH_SUS_MOUNT\n", new_list->info.target_dev, new_list->info.target_pathname);
++    SUSFS_LOGI("target_pathname: '%s', is successfully added to LH_SUS_MOUNT\n", new_list->info.target_pathname);
 +    return 0;
 +}
 +
@@ -919,7 +959,6 @@ index 000000000..989a48028
 +}
 +
 +int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, int syscall_family) {
-+	size_t size = 4096;
 +	int res = -1;
 +	int status = 0;
 +	char* path = NULL;
@@ -932,14 +971,14 @@ index 000000000..989a48028
 +		goto out;
 +	}
 +
-+	path = kmalloc(size, GFP_KERNEL);
++	path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
 +
 +	if (path == NULL) {
 +		status = -1;
 +		return status;
 +	}
 +
-+	ptr = d_path(file, path, size);
++	ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME);
 +
 +	if (IS_ERR(ptr)) {
 +		status = -1;
@@ -1009,7 +1048,6 @@ index 000000000..989a48028
 +}
 +
 +int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
-+	size_t size = 4096;
 +	int res = -1;
 +	int status = 0;
 +	char* path = NULL;
@@ -1023,14 +1061,14 @@ index 000000000..989a48028
 +
 +	//if (!uid_matches_suspicious_mount()) return status;
 +
-+	path = kmalloc(size, GFP_KERNEL);
++	path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
 +
 +	if (path == NULL) {
 +		status = -1;
 +		return status;
 +	}
 +
-+	ptr = __d_path(&mnt_path, root, path, size);
++	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME);
 +
 +	if (!ptr) {
 +		status = -1;
@@ -1049,8 +1087,8 @@ index 000000000..989a48028
 +
 +	list_for_each_entry_safe(cursor, temp, &LH_SUS_MOUNT, list) {
 +        if (!strcmp(path, cursor->info.target_pathname)) {
-+			SUSFS_LOGI("target_dev: '%lu', target_pathname '%s' won't be shown to process with UID %i\n",
-+						cursor->info.target_dev, cursor->info.target_pathname, current_uid().val);
++			SUSFS_LOGI("target_pathname '%s' won't be shown to process with UID %i\n",
++						cursor->info.target_pathname, current_uid().val);
 +			status = 1;
 +			goto out;
 +        }
@@ -1509,6 +1547,120 @@ index 000000000..989a48028
 +	}
 +}
 +
++/* Notes:
++ * - The current mechanism cannot deal with umounted path, so to get the best outcome is not to
++ *   enable umount by ksu, and put all your mounts to add_sus_mount and add_sus_path
++ */
++void susfs_add_mnt_id_recorder(void) {
++    struct st_susfs_mnt_id_recorder_list *mnt_id_recorder_cursor;
++    struct st_susfs_mnt_id_recorder_list *new_list = NULL;
++    struct st_susfs_sus_mount_list *sus_mount_cursor;
++
++    struct mnt_namespace *ns = current->nsproxy->mnt_ns;
++    struct mount *mnt; 
++
++    struct path mnt_path;
++    char path[SUSFS_MAX_LEN_PATHNAME];
++    char *p_path = NULL;
++    char *end = NULL;
++    int res;
++
++    int cur_pid = current->pid;
++    int count = 0;
++
++    list_for_each_entry(mnt_id_recorder_cursor, &LH_MOUNT_ID_RECORDER, list) {
++        if (mnt_id_recorder_cursor->info.pid == cur_pid) {
++            return;
++        }
++    }
++
++    new_list = kzalloc(sizeof(struct st_susfs_mnt_id_recorder_list), GFP_KERNEL);
++    if (!new_list) {
++        SUSFS_LOGE("No enough memory\n");
++        return;
++	}
++
++    new_list->info.pid = cur_pid;
++
++    list_for_each_entry(mnt, &ns->list, mnt_list) {
++        list_for_each_entry(sus_mount_cursor, &LH_SUS_MOUNT, list) {
++            mnt_path.dentry = mnt->mnt.mnt_root;
++            mnt_path.mnt = &mnt->mnt;
++            if (path == NULL) {
++                continue;
++            }
++            p_path = d_path(&mnt_path, path, SUSFS_MAX_LEN_PATHNAME);
++            if (IS_ERR(p_path)) {
++                continue;
++            }
++            end = mangle_path(path, p_path, " \t\n\\");
++            if (!end) {
++                continue;
++            }
++            res = end - path;
++            path[(size_t) res] = '\0';
++            if (!strcmp(path, sus_mount_cursor->info.target_pathname)) {
++                SUSFS_LOGI("found target_mnt_id: '%d', target_pathname: '%s' for pid '%d'\n", mnt->mnt_id, sus_mount_cursor->info.target_pathname, cur_pid);
++                new_list->info.target_mnt_id[count++] = mnt->mnt_id;
++                new_list->info.count = count;
++                break;
++            }
++        }
++    }
++
++    INIT_LIST_HEAD(&new_list->list);
++    spin_lock(&susfs_mnt_id_recorder_spin_lock);
++    list_add_tail(&new_list->list, &LH_MOUNT_ID_RECORDER);
++    spin_unlock(&susfs_mnt_id_recorder_spin_lock);
++    SUSFS_LOGI("recording pid '%u' to LH_MOUNT_ID_RECORDER\n", new_list->info.pid);
++}
++
++int susfs_get_fake_mnt_id(int mnt_id) {
++    struct st_susfs_mnt_id_recorder_list *cursor;
++    int cur_pid = current->pid;
++    int i;
++
++    list_for_each_entry(cursor, &LH_MOUNT_ID_RECORDER, list) {
++        if (cursor->info.pid == cur_pid) {
++            for (i = 0; i < cursor->info.count; i++) {
++                // if comparing with first target_mnt_id and mnt_id is before any target_mnt_id
++                if (i == 0 && mnt_id < cursor->info.target_mnt_id[i]) {
++                    return mnt_id;
++                }
++                // if comparing with last target_mnt_id and mnt_id is after the last target_mnt_id
++                if (i+1 == cursor->info.count && cursor->info.target_mnt_id[i] < mnt_id) {
++                    return mnt_id - cursor->info.count;
++                }
++                // else comparing the target_mnt_id[i] with previous one and next one
++                if (cursor->info.target_mnt_id[i-1] < mnt_id && mnt_id < cursor->info.target_mnt_id[i]) {
++                    return mnt_id - i;
++                }
++                if (cursor->info.target_mnt_id[i] < mnt_id && mnt_id < cursor->info.target_mnt_id[i+1]) {
++                    return mnt_id - (i+1);
++                }
++            }
++        }
++    }
++    return mnt_id;
++}
++
++void susfs_remove_mnt_id_recorder(void) {
++    struct st_susfs_mnt_id_recorder_list *cursor, *temp;
++    int cur_pid = current->pid;
++
++    spin_lock(&susfs_mnt_id_recorder_spin_lock);
++    list_for_each_entry_safe(cursor, temp, &LH_MOUNT_ID_RECORDER, list) {
++        if (cursor->info.pid == cur_pid) {
++            SUSFS_LOGI("removing pid '%u' from LH_MOUNT_ID_RECORDER\n", cursor->info.pid);
++            list_del(&cursor->list);
++            kfree(cursor);
++            spin_unlock(&susfs_mnt_id_recorder_spin_lock);
++            return;
++        }
++    }
++    spin_unlock(&susfs_mnt_id_recorder_spin_lock);
++}
++
 +static void susfs_my_uname_init(void) {
 +	memset(&my_uname, 0, sizeof(struct st_susfs_uname));
 +	strncpy(my_uname.sysname, "default", __NEW_UTS_LEN);
@@ -1520,6 +1672,7 @@ index 000000000..989a48028
 +
 +void __init susfs_init(void) {
 +    spin_lock_init(&susfs_spin_lock);
++    spin_lock_init(&susfs_mnt_id_recorder_spin_lock);
 +	susfs_my_uname_init();
 +}
 +
@@ -1542,10 +1695,10 @@ index 2f64e66f9..39a8823c0 100644
  extern void kern_unmount_array(struct vfsmount *mnt[], unsigned int num);
 diff --git a/include/linux/susfs.h b/include/linux/susfs.h
 new file mode 100644
-index 000000000..065c7d93b
+index 000000000..591ba3d2e
 --- /dev/null
 +++ b/include/linux/susfs.h
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,189 @@
 +#ifndef KSU_SUSFS_H
 +#define KSU_SUSFS_H
 +
@@ -1567,7 +1720,8 @@ index 000000000..065c7d93b
 +#define CMD_SUSFS_ADD_SUS_MAPS 0x55560
 +#define CMD_SUSFS_UPDATE_SUS_MAPS 0x55561
 +
-+#define SUSFS_MAX_LEN_PATHNAME 128
++#define SUSFS_MAX_LEN_PATHNAME 256 // 256 should address many paths already unless you are doing some strange experimental stuff, then set your own desired length
++#define SUSFS_MAX_SUS_MNTS 100 // I think 100 is enough, bet you don't have 100 mounts to hide
 +
 +/* non shared to userspace ksu_susfs tool */
 +#define SYSCALL_FAMILY_ALL_ENOENT 0
@@ -1593,6 +1747,7 @@ index 000000000..065c7d93b
 +#define uid_matches_suspicious_kstat() (current_uid().val >= 2000)
 +//#define uid_matches_suspicious_maps() (current_uid().val >= 0)
 +#define uid_matches_suspicious_proc_fd_link() (current_uid().val >= 2000)
++#define uid_matches_proc_need_to_reorder_mnt_id() (current_uid().val >= 10000)
 +
 +struct st_susfs_sus_path {
 +    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
@@ -1600,7 +1755,6 @@ index 000000000..065c7d93b
 +};
 +
 +struct st_susfs_sus_mount {
-+    unsigned long          target_dev;
 +    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
 +};
 +
@@ -1654,6 +1808,12 @@ index 000000000..065c7d93b
 +    char                   spoofed_link_name[SUSFS_MAX_LEN_PATHNAME];
 +};
 +
++struct st_susfs_mnt_id_recorder {
++    int                    pid;
++    int                    target_mnt_id[SUSFS_MAX_SUS_MNTS];
++    int                    count;
++};
++
 +struct st_susfs_sus_path_list {
 +    struct list_head                        list;
 +    struct st_susfs_sus_path                info;
@@ -1666,12 +1826,12 @@ index 000000000..065c7d93b
 +
 +struct st_susfs_sus_kstat_list {
 +    struct list_head                        list;
-+    struct st_susfs_sus_kstat        info;
++    struct st_susfs_sus_kstat               info;
 +};
 +
 +struct st_susfs_sus_maps_list {
 +    struct list_head                        list;
-+    struct st_susfs_sus_maps         info;
++    struct st_susfs_sus_maps                info;
 +};
 +
 +struct st_susfs_try_umount_list {
@@ -1681,7 +1841,12 @@ index 000000000..065c7d93b
 +
 +struct st_susfs_sus_proc_fd_link_list {
 +    struct list_head                        list;
-+    struct st_susfs_sus_proc_fd_link info;
++    struct st_susfs_sus_proc_fd_link        info;
++};
++
++struct st_susfs_mnt_id_recorder_list {
++    struct list_head                        list;
++    struct st_susfs_mnt_id_recorder         info;
 +};
 +
 +struct st_susfs_uname {
@@ -1711,6 +1876,10 @@ index 000000000..065c7d93b
 +void susfs_sus_proc_fd_link(char *pathname, int len);
 +void susfs_try_umount(uid_t target_uid);
 +void susfs_spoof_uname(struct new_utsname* tmp);
++
++void susfs_add_mnt_id_recorder(void);
++int susfs_get_fake_mnt_id(int mnt_id);
++void susfs_remove_mnt_id_recorder(void);
 +
 +void susfs_set_log(bool enabled);
 +
