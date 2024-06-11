@@ -644,10 +644,10 @@ index 000000000..245e07536
 +
 +	memcpy(&new_list->info, &info, sizeof(struct st_susfs_sus_kstat));
 +	/* Seems the dev number issue is finally solved, the userspace stat we see is already a encoded dev
-+	 * which is set by new_encode_dev() / huge_encode_dev() function for 64bit system and 
++	 * which is set by new_encode_dev() / huge_encode_dev() function for 64bit system and
 +	 * old_encode_dev() for 32bit only system, that's why we need to decode it in kernel as well,
 +	 * and different kernel may have different function to encode the dev number, be cautious!
-+	 * Also check your encode_dev() macro in fs/stat.c to determine which one to use 
++	 * Also check your encode_dev() macro in fs/stat.c to determine which one to use
 +	 */
 +#if defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64)
 +#ifdef CONFIG_MIPS
@@ -695,7 +695,7 @@ index 000000000..245e07536
 +    struct st_susfs_sus_maps_list *cursor, *temp;
 +    struct st_susfs_sus_maps_list *new_list = NULL;
 +	struct st_susfs_sus_maps info;
-+	
++
 +	if (copy_from_user(&info, user_info, sizeof(struct st_susfs_sus_maps))) {
 +		SUSFS_LOGE("failed copying from userspace\n");
 +		return 1;
@@ -1304,12 +1304,12 @@ index 000000000..245e07536
 +	if (check_mnt && !should_umount(&path)) {
 +		return;
 +	}
-+	
++
 +	umount_mnt(&path, flags);
 +}
 +
 +void susfs_try_umount(uid_t target_uid) {
-+    struct st_susfs_try_umount_list *cursor, *temp;
++	struct st_susfs_try_umount_list *cursor, *temp;
 +
 +	list_for_each_entry_safe(cursor, temp, &LH_TRY_UMOUNT_PATH, list) {
 +		SUSFS_LOGI("umounting '%s' for uid: %d\n", cursor->info.target_pathname, target_uid);
