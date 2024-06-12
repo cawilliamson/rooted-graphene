@@ -19,6 +19,22 @@ export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP
 ### CLEANUP PREVIOUS BUILDS
 rm -rf kernel/ rom/
 
+### FUNCTIONS
+
+# Function to run repo sync until successful
+function repo_sync_until_success() {
+  # disable exit on error - we expect this to fail a few times
+  set +e
+
+  until repo sync -j"$(nproc --all)"; do
+    echo "repo sync failed, retrying in 10 seconds..."
+    sleep 10
+  done
+
+  # re-enable exit on error - we're done failing now! :)
+  set -e
+}
+
 ### SETUP BUILD SYSTEM
 
 # set apt to noninteractive mode
@@ -86,7 +102,7 @@ pushd kernel/
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
   fi
-  repo sync -j4 # limit to 4 to avoid throttling
+  repo_sync_until_success
 
   # fetch & apply ksu and susfs patches
   pushd aosp/
@@ -127,7 +143,7 @@ mkdir -p rom/
 pushd rom/
   # sync rom sources
   repo init -u https://github.com/GrapheneOS/platform_manifest.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
-  repo sync -j4 # limit to 4 to avoid throttling
+  repo_sync_until_success
 
   # copy kernel sources
   cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET_GROUP}-kernel/"
