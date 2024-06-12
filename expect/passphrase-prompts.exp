@@ -1,9 +1,7 @@
 #!/usr/bin/expect -f
 
-set arg1 [lindex $argv 0]
-
 set timeout -1
-spawn $arg1
+spawn {*}$argv
 match_max 100000
 
 # Loop to handle multiple passphrase prompts
