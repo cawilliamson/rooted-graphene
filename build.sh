@@ -7,6 +7,7 @@ set -e
 # set static variables
 AVBROOT_VERSION="3.2.2"
 ROM_TARGET="felix"
+SUSFS_VERSION="1.3.2"
 
 # determine rom target code
 if [ "${ROM_TARGET}" == "husky" ]; then
@@ -14,7 +15,7 @@ if [ "${ROM_TARGET}" == "husky" ]; then
 else
   ROM_TARGET_GROUP="${ROM_TARGET}"
 fi
-export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP
+export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP SUSFS_VERSION
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rfv kernel/ rom/
@@ -111,14 +112,14 @@ pushd kernel/
 
     # apply susfs (to KernelSU)
     pushd KernelSU/
-      git am ../../../patches/KernelSU/*.patch
+      git am ../../../patches/SUSFS-${SUSFS_VERSION}/KernelSU/*.patch
     popd
 
     # apply susfs (to kernel itself)
     if [ "${ROM_TARGET}" == "husky" ]; then
-      git am ../../patches/kernel-5.15/*.patch
+      git am ../../patches/SUSFS-${SUSFS_VERSION}/kernel-5.15/*.patch
     else
-      git am ../../patches/kernel-5.10/*.patch
+      git am ../../patches/SUSFS-${SUSFS_VERSION}/kernel-5.10/*.patch
     fi
   popd
 
