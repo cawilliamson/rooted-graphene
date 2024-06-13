@@ -474,9 +474,9 @@ index eafb75755..c214f5c5f 100644
  static int mountinfo_open(struct inode *inode, struct file *file)
  {
 +#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
-+if (uid_matches_proc_need_to_reorder_mnt_id()) {
-+	susfs_add_mnt_id_recorder();
-+}
++	if (uid_matches_proc_need_to_reorder_mnt_id()) {
++		susfs_add_mnt_id_recorder();
++	}
 +#endif
  	return mounts_open_common(inode, file, show_mountinfo);
  }
