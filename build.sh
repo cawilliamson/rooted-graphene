@@ -116,7 +116,7 @@ pushd kernel/
 
     # apply susfs (to KernelSU)
     pushd KernelSU/
-      git am ../../../patches/KernelSU/*.patch
+      git am ../../../patches/KernelSU/10_enable_susfs_for_ksu.patch
     popd
 
     # determine target kernel version
@@ -127,7 +127,7 @@ pushd kernel/
     fi
 
     # apply susfs to kernel
-    git am "../../patches/${TARGET_KERNEL_VERSION}/*.patch"
+    git am "../../patches/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel
     cp -v "../../patches/${TARGET_KERNEL_VERSION}/fs/susfs.c" fs/
