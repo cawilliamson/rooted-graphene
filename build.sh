@@ -7,7 +7,6 @@ set -e
 # set static variables
 AVBROOT_VERSION="3.2.2"
 ROM_TARGET="felix"
-SUSFS_VERSION="1.3.2"
 
 # determine rom target code
 if [ "${ROM_TARGET}" == "husky" ]; then
@@ -15,7 +14,7 @@ if [ "${ROM_TARGET}" == "husky" ]; then
 else
   ROM_TARGET_GROUP="${ROM_TARGET}"
 fi
-export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP SUSFS_VERSION
+export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rfv kernel/ rom/
@@ -99,6 +98,11 @@ mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
   if [ "${ROM_TARGET}" == "husky" ]; then
+    # REMOVE
+    echo "Temporarily disabled whilst I fix susfs for 5.15"
+    exit 1
+    # REMOVE
+
     repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
@@ -112,15 +116,22 @@ pushd kernel/
 
     # apply susfs (to KernelSU)
     pushd KernelSU/
-      git am ../../../patches/SUSFS-${SUSFS_VERSION}/KernelSU/*.patch
+      git am ../../../patches/KernelSU/*.patch
     popd
 
-    # apply susfs (to kernel itself)
+    # determine target kernel version
     if [ "${ROM_TARGET}" == "husky" ]; then
-      git am ../../patches/SUSFS-${SUSFS_VERSION}/kernel-5.15/*.patch
+      TARGET_KERNEL_VERSION="5.15"
     else
-      git am ../../patches/SUSFS-${SUSFS_VERSION}/kernel-5.10/*.patch
+      TARGET_KERNEL_VERSION="5.10"
     fi
+
+    # apply susfs to kernel
+    git am "../../patches/${TARGET_KERNEL_VERSION}/*.patch"
+
+    # copy susfs files to kernel
+    cp -v "../../patches/${TARGET_KERNEL_VERSION}/fs/susfs.c" fs/
+    cp -v "../../patches/${TARGET_KERNEL_VERSION}/include/linux/susfs.h" include/linux/
   popd
 
   # build kernel
