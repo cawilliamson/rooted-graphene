@@ -166,7 +166,7 @@ int susfs_add_sus_proc_fd_link(struct st_susfs_sus_proc_fd_link* __user user_inf
 int susfs_add_try_umount(struct st_susfs_try_umount* __user user_info);
 int susfs_set_uname(struct st_susfs_uname* __user user_info);
 
-int susfs_sus_path_by_path(struct path* file, int* errno_to_be_changed, int syscall_family);
+int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, int syscall_family);
 int susfs_sus_path_by_filename(struct filename* name, int* errno_to_be_changed, int syscall_family);
 int susfs_sus_mount(struct vfsmount* mnt, struct path* root);
 int susfs_sus_ino_for_filldir64(unsigned long ino);

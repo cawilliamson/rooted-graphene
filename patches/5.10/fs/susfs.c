@@ -393,7 +393,7 @@ int susfs_set_uname(struct st_susfs_uname* __user user_info) {
 	return 0;
 }
 
-int susfs_sus_path_by_path(struct path* file, int* errno_to_be_changed, int syscall_family) {
+int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, int syscall_family) {
 	int res = -1;
 	int status = 0;
 	char* path = NULL;
