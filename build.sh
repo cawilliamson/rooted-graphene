@@ -7,6 +7,7 @@ set -e
 # set static variables
 AVBROOT_VERSION="3.2.2"
 ROM_TARGET="felix"
+TARGET_RELEASE="ap2a"
 
 # determine rom target code
 if [ "${ROM_TARGET}" == "husky" ]; then
@@ -14,7 +15,7 @@ if [ "${ROM_TARGET}" == "husky" ]; then
 else
   ROM_TARGET_GROUP="${ROM_TARGET}"
 fi
-export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP
+export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP TARGET_RELEASE
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rfv kernel/ kernel-out/ rom/
@@ -166,11 +167,11 @@ pushd rom/
   yarnpkg install --cwd vendor/adevtool/
   # shellcheck source=/dev/null
   . build/envsetup.sh
-  TARGET_RELEASE=ap1a m aapt2
+  m aapt2
   ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
 
   # start build
-  lunch "${ROM_TARGET}-ap1a-user"
+  lunch "${ROM_TARGET}-${TARGET_RELEASE}-user"
   m vendorbootimage vendorkernelbootimage target-files-package
 
   # generate keys
