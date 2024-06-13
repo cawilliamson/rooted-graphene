@@ -17,7 +17,7 @@ fi
 export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP
 
 ### CLEANUP PREVIOUS BUILDS
-rm -rfv kernel/ rom/
+rm -rfv kernel/ kernel-out/ rom/
 
 ### FUNCTIONS
 
