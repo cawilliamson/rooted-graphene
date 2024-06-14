@@ -131,8 +131,8 @@ pushd kernel/
     git am "../../patches/susfs/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel
-    cp -v "../../patches/${TARGET_KERNEL_VERSION}/fs/susfs.c" fs/
-    cp -v "../../patches/${TARGET_KERNEL_VERSION}/include/linux/susfs.h" include/linux/
+    cp -v "../../patches/susfs/${TARGET_KERNEL_VERSION}/fs/susfs.c" fs/
+    cp -v "../../patches/susfs/${TARGET_KERNEL_VERSION}/include/linux/susfs.h" include/linux/
 
     # enable wireguard by default
     #git am "../../patches/wireguard/0001-Enable-wireguard-by-default.patch"
