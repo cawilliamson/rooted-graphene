@@ -27,8 +27,8 @@ function repo_sync_until_success() {
   # disable exit on error - we expect this to fail a few times
   set +e
 
-  # sync using 4 threads - less likely to be throttled
-  until repo sync -j4; do
+  # perform sync
+  until repo sync -c -f -j$(nproc --all) --no-clone-bundle --no-tags; do
     echo "repo sync failed, retrying in 1 minute..."
     sleep 60
   done
