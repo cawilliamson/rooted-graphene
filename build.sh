@@ -135,7 +135,7 @@ pushd kernel/
     cp -v "../../patches/${TARGET_KERNEL_VERSION}/include/linux/susfs.h" include/linux/
 
     # enable wireguard by default
-    git am "../../patches/wireguard/0001-Enable-wireguard-by-default.patch"
+    #git am "../../patches/wireguard/0001-Enable-wireguard-by-default.patch"
   popd
 
   # build kernel
