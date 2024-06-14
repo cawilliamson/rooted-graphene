@@ -7,7 +7,7 @@ set -e
 # set static variables
 AVBROOT_VERSION="3.2.2"
 ROM_TARGET="felix"
-TARGET_RELEASE="ap2a"
+export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
 if [ "${ROM_TARGET}" == "husky" ]; then
@@ -15,7 +15,6 @@ if [ "${ROM_TARGET}" == "husky" ]; then
 else
   ROM_TARGET_GROUP="${ROM_TARGET}"
 fi
-export AVBROOT_VERSION ROM_TARGET ROM_TARGET_GROUP TARGET_RELEASE
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rfv kernel/ kernel-out/ rom/
@@ -172,6 +171,9 @@ pushd rom/
   . build/envsetup.sh
   m aapt2
   ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
+
+  # determine target release
+  TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
 
   # start build
   lunch "${ROM_TARGET}-${TARGET_RELEASE}-user"
