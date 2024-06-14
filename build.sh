@@ -28,7 +28,7 @@ function repo_sync_until_success() {
   set +e
 
   # perform sync
-  until repo sync -c -f -j$(nproc --all) --no-clone-bundle --no-tags; do
+  until repo sync -c -j$(nproc --all) --no-clone-bundle --no-tags; do
     echo "repo sync failed, retrying in 1 minute..."
     sleep 60
   done
