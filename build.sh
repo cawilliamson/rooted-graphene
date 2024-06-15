@@ -167,13 +167,19 @@ pushd rom/
 
   # fetch vendor binaries
   yarnpkg install --cwd vendor/adevtool/
+
   # shellcheck source=/dev/null
   . build/envsetup.sh
-  m aapt2
-  ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
 
   # determine target release
   TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
+  export TARGET_RELEASE
+
+  # build aapt2
+  m aapt2
+
+  # fetch vendor binaries
+  ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
 
   # start build
   lunch "${ROM_TARGET}-${TARGET_RELEASE}-user"
