@@ -40,14 +40,16 @@ avbroot ota patch \
 # move ota zip to web dir
 cp -v $OTA_ZIP_PATH.patched /var/www/html/$OTA_ZIP_NAME
 
-# generate csig for zip
-custota-tool gen-csig \
-  --input /var/www/html/$OTA_ZIP_NAME \
-  --key $HOME/.avbroot/ota.key \
-  --passphrase-env-var OTA_PASSWORD \
-  --cert $HOME/.avbroot/ota.crt
+pushd /var/www/html
+  # generate csig for zip
+  custota-tool gen-csig \
+    --input $OTA_ZIP_NAME \
+    --key $HOME/.avbroot/ota.key \
+    --passphrase-env-var OTA_PASSWORD \
+    --cert $HOME/.avbroot/ota.crt
 
-# create / update the custota json file
-custota-tool gen-update-info \
-  --file /var/www/html/$DEVICE_CODENAME.json \
-  --location /var/www/html/$OTA_ZIP_NAME
+  # create / update the custota json file
+  custota-tool gen-update-info \
+    --file $DEVICE_CODENAME.json \
+    --location $OTA_ZIP_NAME
+popd
