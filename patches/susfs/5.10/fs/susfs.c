@@ -406,14 +406,14 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 	struct st_susfs_sus_path_list *cursor, *temp;
 
 	if (!uid_matches_suspicious_path() || file == NULL) {
-		goto out;
+		return status;
 	}
 
 	path = kmalloc(SUSFS_MAX_LEN_PATHNAME_PARSE, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_path: kmalloc failed\n");
-		goto out;
+		return status;
 	}
 
 	ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
@@ -455,11 +455,11 @@ int susfs_sus_path_by_filename(struct filename* name, int* errno_to_be_changed, 
 	struct path path;
 
 	if (IS_ERR(name)) {
-		return 0;
+		return status;
 	}
 
 	if (!uid_matches_suspicious_path() || name == NULL) {
-		return 0;
+		return status;
 	}
 
 	ret = kern_path(name->name, LOOKUP_FOLLOW, &path);
@@ -503,7 +503,7 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_mount: kmalloc failed\n");
-		goto out;
+		return status;
 	}
 
 	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
@@ -1024,7 +1024,7 @@ void susfs_add_mnt_id_recorder(void) {
 		list_for_each_entry(sus_mount_cursor, &LH_SUS_MOUNT, list) {
 			mnt_path.dentry = mnt->mnt.mnt_root;
 			mnt_path.mnt = &mnt->mnt;
-			p_path = d_path(&mnt_path, path, SUSFS_MAX_LEN_PATHNAME);
+			p_path = d_path(&mnt_path, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
 			if (IS_ERR(p_path)) {
 				continue;
 			}
