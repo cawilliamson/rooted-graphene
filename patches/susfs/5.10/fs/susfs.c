@@ -409,14 +409,14 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 		goto out;
 	}
 
-	path = kmalloc(4096, GFP_KERNEL);
+	path = kmalloc(SUSFS_MAX_LEN_PATHNAME_PARSE, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_path: kmalloc failed\n");
 		goto out;
 	}
 
-	ptr = d_path(file, path, 4096);
+	ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
 
 	if (IS_ERR(ptr)) {
 		SUSFS_LOGE("sus_path: d_path failed\n");
@@ -499,14 +499,14 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 
 	//if (!uid_matches_suspicious_mount()) return status;
 
-	path = kmalloc(4096, GFP_KERNEL);
+	path = kmalloc(SUSFS_MAX_LEN_PATHNAME_PARSE, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_mount: kmalloc failed\n");
 		goto out;
 	}
 
-	ptr = __d_path(&mnt_path, root, path, 4096);
+	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
 
 	if (!ptr) {
 		SUSFS_LOGE("sus_mount: d_path failed\n");
