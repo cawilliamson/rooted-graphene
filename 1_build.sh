@@ -210,8 +210,8 @@ pushd rom/
 
   # build release
   expect ../expect/passphrase-prompts.exp script/release.sh ${ROM_TARGET}
-
-  # Write output
-  echo "The file you are likely looking for is:"
-  ls out/release-*/*ota_update*.zip
 popd
+
+# Write output
+echo "The file you are likely looking for is:"
+ls rom/out/release-*/*ota_update*.zip
