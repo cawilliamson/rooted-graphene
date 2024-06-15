@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
 
+# set static variables
+CUSTOTA_VERSION="4.4"
+export CUSTOTA_VERSION
+
+# load in avbroot passwords
+. $HOME/.avbroot/passwords.sh
+
 # install all apt dependencies
 apt update
 apt dist-upgrade -y
 apt install -y nginx
 
-# load in avbroot password
-. $HOME/.avbroot/passwords.sh
+# install custota
+pushd /var/tmp
+  curl -LSs "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_VERSION}/custota-${CUSTOTA_VERSION}-x86_64-unknown-linux-gnu.zip" > avbroot.zip
+  unzip -o -p custota.zip custota-tool > /usr/bin/custota-tool
+  chmod +x /usr/bin/custota-tool
+  rm -f custota.zip
+popd
 
 # find latest ota zip
 OTA_ZIP_PATH=$(ls rom/out/release-*/*ota_update*.zip)
