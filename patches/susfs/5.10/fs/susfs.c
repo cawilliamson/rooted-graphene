@@ -409,21 +409,24 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 		goto out;
 	}
 
-	path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
+	path = kmalloc(4096, GFP_KERNEL);
 
 	if (path == NULL) {
-		return status;
+		SUSFS_LOGE("sus_path: kmalloc failed\n");
+		goto out;
 	}
 
-	ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME);
+	ptr = d_path(file, path, 4096);
 
 	if (IS_ERR(ptr)) {
+		SUSFS_LOGE("sus_path: d_path failed\n");
 		goto out;
 	}
 
 	end = mangle_path(path, ptr, " \t\n\\");
 
 	if (!end) {
+		SUSFS_LOGE("sus_path: mangle_path failed\n");
 		goto out;
 	}
 
@@ -496,21 +499,24 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 
 	//if (!uid_matches_suspicious_mount()) return status;
 
-	path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
+	path = kmalloc(4096, GFP_KERNEL);
 
 	if (path == NULL) {
-		return status;
+		SUSFS_LOGE("sus_mount: kmalloc failed\n");
+		goto out;
 	}
 
-	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME);
+	ptr = __d_path(&mnt_path, root, path, 4096);
 
 	if (!ptr) {
+		SUSFS_LOGE("sus_mount: d_path failed\n");
 		goto out;
 	}
 
 	end = mangle_path(path, ptr, " \t\n\\");
 
 	if (!end) {
+		SUSFS_LOGE("sus_mount: mangle_path failed\n");
 		goto out;
 	}
 
