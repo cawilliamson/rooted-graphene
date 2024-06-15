@@ -46,7 +46,7 @@ index 67f177f4..47f98f36 100644
 +config KSU_SUSFS_SUS_MOUNT_MNT_ID_REORDER
 +	bool "Enable to re-order mount id and parent mount id in mountinfo (experimental)"
 +	depends on KSU_SUSFS_SUS_MOUNT
-+	default y
++	default n
 +	help
 +	  - Enable this option will automatically re-order the mount id and parent mount id in /proc/self/mountinfo as much as it can according to the list of sus_mount.
 +	  - Only mount paths added to sus_mount will be counted, because we are not able to get the mount id of sus mounts umounted by user during enumerating the current mount list.
