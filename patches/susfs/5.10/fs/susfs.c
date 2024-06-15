@@ -139,10 +139,10 @@ int susfs_add_sus_kstat(struct st_susfs_sus_kstat* __user user_info) {
 
 	memcpy(&new_list->info, &info, sizeof(struct st_susfs_sus_kstat));
 	/* Seems the dev number issue is finally solved, the userspace stat we see is already a encoded dev
-	 * which is set by new_encode_dev() / huge_encode_dev() function for 64bit system and 
+	 * which is set by new_encode_dev() / huge_encode_dev() function for 64bit system and
 	 * old_encode_dev() for 32bit only system, that's why we need to decode it in kernel as well,
 	 * and different kernel may have different function to encode the dev number, be cautious!
-	 * Also check your encode_dev() macro in fs/stat.c to determine which one to use 
+	 * Also check your encode_dev() macro in fs/stat.c to determine which one to use
 	 */
 #if defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64)
 #ifdef CONFIG_MIPS
@@ -190,7 +190,7 @@ int susfs_add_sus_maps(struct st_susfs_sus_maps* __user user_info) {
 	struct st_susfs_sus_maps_list *cursor, *temp;
 	struct st_susfs_sus_maps_list *new_list = NULL;
 	struct st_susfs_sus_maps info;
-	
+
 	if (copy_from_user(&info, user_info, sizeof(struct st_susfs_sus_maps))) {
 		SUSFS_LOGE("failed copying from userspace\n");
 		return 1;
@@ -406,7 +406,6 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 	struct st_susfs_sus_path_list *cursor, *temp;
 
 	if (!uid_matches_suspicious_path() || file == NULL) {
-		status = 0;
 		goto out;
 	}
 
@@ -414,7 +413,6 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 	path = kmalloc(4096, GFP_KERNEL);
 
 	if (path == NULL) {
-		status = -1;
 		return status;
 	}
 
@@ -422,14 +420,12 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 	ptr = d_path(file, path, 4096);
 
 	if (IS_ERR(ptr)) {
-		status = -1;
 		goto out;
 	}
 
 	end = mangle_path(path, ptr, " \t\n\\");
 
 	if (!end) {
-		status = -1;
 		goto out;
 	}
 
@@ -458,7 +454,7 @@ int susfs_sus_path_by_filename(struct filename* name, int* errno_to_be_changed, 
 	struct path path;
 
 	if (IS_ERR(name)) {
-		return -1;
+		return 0;
 	}
 
 	if (!uid_matches_suspicious_path() || name == NULL) {
@@ -505,21 +501,18 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 	path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
 
 	if (path == NULL) {
-		status = -1;
 		return status;
 	}
 
 	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME);
 
 	if (!ptr) {
-		status = -1;
 		goto out;
 	}
 
 	end = mangle_path(path, ptr, " \t\n\\");
 
 	if (!end) {
-		status = -1;
 		goto out;
 	}
 
