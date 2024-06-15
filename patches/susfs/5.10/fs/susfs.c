@@ -409,15 +409,13 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 		goto out;
 	}
 
-	//path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
-	path = kmalloc(4096, GFP_KERNEL);
+	path = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
 
 	if (path == NULL) {
 		return status;
 	}
 
-	//ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME);
-	ptr = d_path(file, path, 4096);
+	ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME);
 
 	if (IS_ERR(ptr)) {
 		goto out;
