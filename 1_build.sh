@@ -15,8 +15,11 @@ ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
-if [ "${ROM_TARGET}" == "husky" ]; then
+if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
+  # pixel 8 pro
   ROM_TARGET_GROUP="shusky"
+elif [ "${ROM_TARGET}" == "cheetah" ] || [ "${ROM_TARGET}" == "panther" ]; then
+  ROM_TARGET_GROUP="pantah"
 else
   ROM_TARGET_GROUP="${ROM_TARGET}"
 fi
@@ -104,7 +107,7 @@ popd
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "husky" ]; then
+  if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
     # REMOVE
     echo "Temporarily disabled whilst I fix susfs for 5.15"
     exit 1
