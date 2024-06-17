@@ -15,12 +15,14 @@ ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
-if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-  # pixel 8 pro
+if [ "${ROM_TARGET}" == "akita" ] || [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
+  # pixel 8a / pixel 8 / pixel 8 pro
   ROM_TARGET_GROUP="shusky"
-elif [ "${ROM_TARGET}" == "cheetah" ] || [ "${ROM_TARGET}" == "panther" ]; then
+elif [ "${ROM_TARGET}" == "cheetah" ] || [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "lynx" ]; then
+  # pixel 7a / pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
 else
+  # probably pixel fold
   ROM_TARGET_GROUP="${ROM_TARGET}"
 fi
 
@@ -148,7 +150,12 @@ pushd kernel/
   popd
 
   # build kernel
-  BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
+  if [ "${ROM_TARGET_GROUP}" == "pantah" ]; then
+    # no idea why this is cloudripper.... D:
+    BUILD_AOSP_KERNEL=1 LTO=full ./build_cloudripper.sh
+  else
+    BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
+  fi
 popd
 
 # stash parts we need
