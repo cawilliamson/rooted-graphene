@@ -73,10 +73,6 @@ apt install -y \
   yarnpkg \
   zip
 
-### FETCH LATEST GRAPHENE TAG
-GRAPHENE_RELEASE=$(curl -s "https://api.github.com/repos/GrapheneOS/device_google_${ROM_TARGET_GROUP}/tags" | jq -r '.[0].name')
-export GRAPHENE_RELEASE
-
 # install repo command
 curl -s https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
 chmod +x /usr/bin/repo
@@ -102,6 +98,20 @@ pushd /var/tmp
   chmod +x /usr/bin/avbroot
   rm -f avbroot.zip
 popd
+
+### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
+
+# fetch latest device sources temporarily
+git clone "https://github.com/GrapheneOS/device_google_${ROM_TARGET_GROUP}.git" device_tmp/
+
+# determine tag
+pushd device_tmp
+  GRAPHENE_RELEASE=$(git describe --tags --abbrev=0)
+  export GRAPHENE_RELEASE
+popd
+
+# cleanup device sources
+rm -rf device_tmp/
 
 ### BUILD KERNEL
 
