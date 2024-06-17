@@ -7,6 +7,7 @@
 #include <linux/namei.h>
 #include <linux/list.h>
 #include <linux/init_task.h>
+#include <linux/limits.h>
 #include <linux/spinlock.h>
 #include <linux/stat.h>
 #include <linux/uaccess.h>
@@ -409,14 +410,14 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 		return status;
 	}
 
-	path = kmalloc(SUSFS_MAX_LEN_PATHNAME_PARSE, GFP_KERNEL);
+	path = kmalloc(PATH_MAX, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_path: kmalloc failed\n");
 		return status;
 	}
 
-	ptr = d_path(file, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
+	ptr = d_path(file, path, PATH_MAX);
 
 	if (IS_ERR(ptr)) {
 		SUSFS_LOGE("sus_path: d_path failed\n");
@@ -499,14 +500,14 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 
 	//if (!uid_matches_suspicious_mount()) return status;
 
-	path = kmalloc(SUSFS_MAX_LEN_PATHNAME_PARSE, GFP_KERNEL);
+	path = kmalloc(PATH_MAX, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_mount: kmalloc failed\n");
 		return status;
 	}
 
-	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
+	ptr = __d_path(&mnt_path, root, path, PATH_MAX);
 
 	if (!ptr) {
 		SUSFS_LOGE("sus_mount: __d_path failed\n");
@@ -1024,7 +1025,7 @@ void susfs_add_mnt_id_recorder(void) {
 		list_for_each_entry(sus_mount_cursor, &LH_SUS_MOUNT, list) {
 			mnt_path.dentry = mnt->mnt.mnt_root;
 			mnt_path.mnt = &mnt->mnt;
-			p_path = d_path(&mnt_path, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
+			p_path = d_path(&mnt_path, path, PATH_MAX);
 			if (IS_ERR(p_path)) {
 				continue;
 			}
