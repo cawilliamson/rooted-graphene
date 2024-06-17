@@ -1,6 +1,6 @@
-From eea75ae8dfced439374b1d9d91387cff9884523b Mon Sep 17 00:00:00 2001
+From b6f6bdee10b556dc39fb43b7ead40cde0931d41b Mon Sep 17 00:00:00 2001
 From: "Christopher A. Williamson" <home@chrisaw.com>
-Date: Fri, 14 Jun 2024 22:55:44 +0100
+Date: Mon, 17 Jun 2024 16:53:30 +0100
 Subject: [PATCH] Add SUSFS in kernel
 
 ---
@@ -9,12 +9,12 @@ Subject: [PATCH] Add SUSFS in kernel
  fs/open.c             |  46 +++++++++++++++++
  fs/proc/base.c        |   9 ++++
  fs/proc/task_mmu.c    |  23 +++++++++
- fs/proc_namespace.c   |  38 ++++++++++++++
+ fs/proc_namespace.c   |  43 +++++++++++++++-
  fs/readdir.c          |  11 ++++
  fs/stat.c             |  15 ++++++
  include/linux/mount.h |   4 ++
  kernel/sys.c          |   9 ++++
- 10 files changed, 277 insertions(+), 3 deletions(-)
+ 10 files changed, 280 insertions(+), 5 deletions(-)
 
 diff --git a/fs/Makefile b/fs/Makefile
 index c7851875b..671190d1d 100644
@@ -396,7 +396,7 @@ index 7e70972b2..71aa8e35b 100644
  	 * Print the dentry name for named mappings, and a
  	 * special [heap] marker for the heap:
 diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
-index eafb75755..eee4a5c9e 100644
+index eafb75755..e987e092c 100644
 --- a/fs/proc_namespace.c
 +++ b/fs/proc_namespace.c
 @@ -18,6 +18,10 @@
@@ -421,7 +421,7 @@ index eafb75755..eee4a5c9e 100644
  	if (sb->s_op->show_devname) {
  		err = sb->s_op->show_devname(m, mnt_path.dentry);
  		if (err)
-@@ -137,8 +145,24 @@ static int show_mountinfo(struct seq_file *m, struct vfsmount *mnt)
+@@ -137,8 +145,25 @@ static int show_mountinfo(struct seq_file *m, struct vfsmount *mnt)
  	struct path mnt_path = { .dentry = mnt->mnt_root, .mnt = mnt };
  	int err;
  
@@ -429,24 +429,26 @@ index eafb75755..eee4a5c9e 100644
 +	if (susfs_sus_mount(mnt, &p->root)) return 0;
 +
 +#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT_MNT_ID_REORDER
-+	if (uid_matches_proc_need_to_reorder_mnt_id()) {
-+		seq_printf(m, "%i %i %u:%u ",
-+			susfs_get_fake_mnt_id(r->mnt_id),
-+			susfs_get_fake_mnt_id(r->mnt_parent->mnt_id),
-+			MAJOR(sb->s_dev), MINOR(sb->s_dev));
-+		goto bypass_orig_flow;
-+	}
++	if (!uid_matches_proc_need_to_reorder_mnt_id()) goto orig_flow;
++
++	seq_printf(m, "%i %i %u:%u ",
++		susfs_get_fake_mnt_id(r->mnt_id),
++		susfs_get_fake_mnt_id(r->mnt_parent->mnt_id),
++		MAJOR(sb->s_dev), MINOR(sb->s_dev));
++	goto bypass_orig_flow;
++orig_flow:
 +#endif //#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT_MNT_ID_REORDER
 +#endif //#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
  	seq_printf(m, "%i %i %u:%u ", r->mnt_id, r->mnt_parent->mnt_id,
- 		   MAJOR(sb->s_dev), MINOR(sb->s_dev));
+-		   MAJOR(sb->s_dev), MINOR(sb->s_dev));
++		MAJOR(sb->s_dev), MINOR(sb->s_dev));
 +#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT_MNT_ID_REORDER
 +bypass_orig_flow:
 +#endif
  	if (sb->s_op->show_path) {
  		err = sb->s_op->show_path(m, mnt->mnt_root);
  		if (err)
-@@ -199,6 +223,10 @@ static int show_vfsstat(struct seq_file *m, struct vfsmount *mnt)
+@@ -199,6 +224,10 @@ static int show_vfsstat(struct seq_file *m, struct vfsmount *mnt)
  	struct super_block *sb = mnt_path.dentry->d_sb;
  	int err;
  
@@ -457,7 +459,16 @@ index eafb75755..eee4a5c9e 100644
  	/* device */
  	if (sb->s_op->show_devname) {
  		seq_puts(m, "device ");
-@@ -300,6 +328,11 @@ static int mounts_release(struct inode *inode, struct file *file)
+@@ -237,7 +266,7 @@ static int show_vfsstat(struct seq_file *m, struct vfsmount *mnt)
+ }
+ 
+ static int mounts_open_common(struct inode *inode, struct file *file,
+-			      int (*show)(struct seq_file *, struct vfsmount *))
++				int (*show)(struct seq_file *, struct vfsmount *))
+ {
+ 	struct task_struct *task = get_proc_task(inode);
+ 	struct nsproxy *nsp;
+@@ -300,6 +329,11 @@ static int mounts_release(struct inode *inode, struct file *file)
  	path_put(&p->root);
  	mnt_cursor_del(p->ns, &p->cursor);
  	put_mnt_ns(p->ns);
@@ -469,7 +480,7 @@ index eafb75755..eee4a5c9e 100644
  	return seq_release_private(inode, file);
  }
  
-@@ -310,6 +343,11 @@ static int mounts_open(struct inode *inode, struct file *file)
+@@ -310,6 +344,11 @@ static int mounts_open(struct inode *inode, struct file *file)
  
  static int mountinfo_open(struct inode *inode, struct file *file)
  {
