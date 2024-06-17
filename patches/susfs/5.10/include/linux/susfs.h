@@ -42,139 +42,154 @@
 #define putname_safe(name) (IS_ERR(name) ? NULL : putname(name))
 
 #define uid_matches_suspicious_path() (current_uid().val >= 2000)
-//#define uid_matches_suspicious_mount() (current_uid().val >= 0)
+// #define uid_matches_suspicious_mount() (current_uid().val >= 0)
 #define uid_matches_suspicious_kstat() (current_uid().val >= 2000)
-//#define uid_matches_suspicious_maps() (current_uid().val >= 0)
+// #define uid_matches_suspicious_maps() (current_uid().val >= 0)
 #define uid_matches_suspicious_proc_fd_link() (current_uid().val >= 2000)
 #define uid_matches_proc_need_to_reorder_mnt_id() (current_uid().val >= 10000)
 
-struct st_susfs_sus_path {
-    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
-    unsigned long          target_ino;
+struct st_susfs_sus_path
+{
+	char target_pathname[SUSFS_MAX_LEN_PATHNAME];
+	unsigned long target_ino;
 };
 
-struct st_susfs_sus_mount {
-    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
+struct st_susfs_sus_mount
+{
+	char target_pathname[SUSFS_MAX_LEN_PATHNAME];
 };
 
-struct st_susfs_sus_kstat {
-    unsigned long          target_ino; // the ino after bind mounted or overlayed
-    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
-    char                   spoofed_pathname[SUSFS_MAX_LEN_PATHNAME];
-    unsigned long          spoofed_ino;
-    unsigned long          spoofed_dev;
-    unsigned int           spoofed_nlink;
-    long                   spoofed_atime_tv_sec;
-    long                   spoofed_mtime_tv_sec;
-    long                   spoofed_ctime_tv_sec;
-    long                   spoofed_atime_tv_nsec;
-    long                   spoofed_mtime_tv_nsec;
-    long                   spoofed_ctime_tv_nsec;
+struct st_susfs_sus_kstat
+{
+	unsigned long target_ino; // the ino after bind mounted or overlayed
+	char target_pathname[SUSFS_MAX_LEN_PATHNAME];
+	char spoofed_pathname[SUSFS_MAX_LEN_PATHNAME];
+	unsigned long spoofed_ino;
+	unsigned long spoofed_dev;
+	unsigned int spoofed_nlink;
+	long spoofed_atime_tv_sec;
+	long spoofed_mtime_tv_sec;
+	long spoofed_ctime_tv_sec;
+	long spoofed_atime_tv_nsec;
+	long spoofed_mtime_tv_nsec;
+	long spoofed_ctime_tv_nsec;
 };
 
-struct st_susfs_sus_maps {
-    bool                   is_statically;
-    int                    compare_mode;
-    bool                   is_isolated_entry;
-    bool                   is_file;
-    unsigned long          prev_target_ino;
-    unsigned long          next_target_ino;
-    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
-    unsigned long          target_ino;
-    unsigned long          target_dev;
-    unsigned long long     target_pgoff;
-    unsigned long          target_prot;
-    unsigned long          target_addr_size;
-    char                   spoofed_pathname[SUSFS_MAX_LEN_PATHNAME];
-    unsigned long          spoofed_ino;
-    unsigned long          spoofed_dev;
-    unsigned long long     spoofed_pgoff;
-    unsigned long          spoofed_prot;
-    bool                   need_to_spoof_pathname;
-    bool                   need_to_spoof_ino;
-    bool                   need_to_spoof_dev;
-    bool                   need_to_spoof_pgoff;
-    bool                   need_to_spoof_prot;
+struct st_susfs_sus_maps
+{
+	bool is_statically;
+	int compare_mode;
+	bool is_isolated_entry;
+	bool is_file;
+	unsigned long prev_target_ino;
+	unsigned long next_target_ino;
+	char target_pathname[SUSFS_MAX_LEN_PATHNAME];
+	unsigned long target_ino;
+	unsigned long target_dev;
+	unsigned long long target_pgoff;
+	unsigned long target_prot;
+	unsigned long target_addr_size;
+	char spoofed_pathname[SUSFS_MAX_LEN_PATHNAME];
+	unsigned long spoofed_ino;
+	unsigned long spoofed_dev;
+	unsigned long long spoofed_pgoff;
+	unsigned long spoofed_prot;
+	bool need_to_spoof_pathname;
+	bool need_to_spoof_ino;
+	bool need_to_spoof_dev;
+	bool need_to_spoof_pgoff;
+	bool need_to_spoof_prot;
 };
 
-struct st_susfs_try_umount {
-    char                   target_pathname[SUSFS_MAX_LEN_PATHNAME];
-    int                    mnt_mode;
+struct st_susfs_try_umount
+{
+	char target_pathname[SUSFS_MAX_LEN_PATHNAME];
+	int mnt_mode;
 };
 
-struct st_susfs_sus_proc_fd_link {
-    char                   target_link_name[SUSFS_MAX_LEN_PATHNAME];
-    char                   spoofed_link_name[SUSFS_MAX_LEN_PATHNAME];
+struct st_susfs_sus_proc_fd_link
+{
+	char target_link_name[SUSFS_MAX_LEN_PATHNAME];
+	char spoofed_link_name[SUSFS_MAX_LEN_PATHNAME];
 };
 
-struct st_susfs_mnt_id_recorder {
-    int                    pid;
-    int                    target_mnt_id[SUSFS_MAX_SUS_MNTS];
-    int                    count;
+struct st_susfs_mnt_id_recorder
+{
+	int pid;
+	int target_mnt_id[SUSFS_MAX_SUS_MNTS];
+	int count;
 };
 
-struct st_susfs_sus_path_list {
-    struct list_head                        list;
-    struct st_susfs_sus_path                info;
+struct st_susfs_sus_path_list
+{
+	struct list_head list;
+	struct st_susfs_sus_path info;
 };
 
-struct st_susfs_sus_mount_list {
-    struct list_head                        list;
-    struct st_susfs_sus_mount               info;
+struct st_susfs_sus_mount_list
+{
+	struct list_head list;
+	struct st_susfs_sus_mount info;
 };
 
-struct st_susfs_sus_kstat_list {
-    struct list_head                        list;
-    struct st_susfs_sus_kstat               info;
+struct st_susfs_sus_kstat_list
+{
+	struct list_head list;
+	struct st_susfs_sus_kstat info;
 };
 
-struct st_susfs_sus_maps_list {
-    struct list_head                        list;
-    struct st_susfs_sus_maps                info;
+struct st_susfs_sus_maps_list
+{
+	struct list_head list;
+	struct st_susfs_sus_maps info;
 };
 
-struct st_susfs_try_umount_list {
-    struct list_head                        list;
-    struct st_susfs_try_umount              info;
+struct st_susfs_try_umount_list
+{
+	struct list_head list;
+	struct st_susfs_try_umount info;
 };
 
-struct st_susfs_sus_proc_fd_link_list {
-    struct list_head                        list;
-    struct st_susfs_sus_proc_fd_link        info;
+struct st_susfs_sus_proc_fd_link_list
+{
+	struct list_head list;
+	struct st_susfs_sus_proc_fd_link info;
 };
 
-struct st_susfs_mnt_id_recorder_list {
-    struct list_head                        list;
-    struct st_susfs_mnt_id_recorder         info;
+struct st_susfs_mnt_id_recorder_list
+{
+	struct list_head list;
+	struct st_susfs_mnt_id_recorder info;
 };
 
-struct st_susfs_uname {
-    char        sysname[__NEW_UTS_LEN+1];
-    char        nodename[__NEW_UTS_LEN+1];
-    char        release[__NEW_UTS_LEN+1];
-    char        version[__NEW_UTS_LEN+1];
-    char        machine[__NEW_UTS_LEN+1];
+struct st_susfs_uname
+{
+	char sysname[__NEW_UTS_LEN + 1];
+	char nodename[__NEW_UTS_LEN + 1];
+	char release[__NEW_UTS_LEN + 1];
+	char version[__NEW_UTS_LEN + 1];
+	char machine[__NEW_UTS_LEN + 1];
 };
 
-int susfs_add_sus_path(struct st_susfs_sus_path* __user user_info);
-int susfs_add_sus_mount(struct st_susfs_sus_mount* __user user_info);
-int susfs_add_sus_kstat(struct st_susfs_sus_kstat* __user user_info);
-int susfs_update_sus_kstat(struct st_susfs_sus_kstat* __user user_info);
-int susfs_add_sus_maps(struct st_susfs_sus_maps* __user user_info);
-int susfs_update_sus_maps(struct st_susfs_sus_maps* __user user_info);
-int susfs_add_sus_proc_fd_link(struct st_susfs_sus_proc_fd_link* __user user_info);
-int susfs_add_try_umount(struct st_susfs_try_umount* __user user_info);
-int susfs_set_uname(struct st_susfs_uname* __user user_info);
+int susfs_add_sus_path(struct st_susfs_sus_path *__user user_info);
+int susfs_add_sus_mount(struct st_susfs_sus_mount *__user user_info);
+int susfs_add_sus_kstat(struct st_susfs_sus_kstat *__user user_info);
+int susfs_update_sus_kstat(struct st_susfs_sus_kstat *__user user_info);
+int susfs_add_sus_maps(struct st_susfs_sus_maps *__user user_info);
+int susfs_update_sus_maps(struct st_susfs_sus_maps *__user user_info);
+int susfs_add_sus_proc_fd_link(struct st_susfs_sus_proc_fd_link *__user user_info);
+int susfs_add_try_umount(struct st_susfs_try_umount *__user user_info);
+int susfs_set_uname(struct st_susfs_uname *__user user_info);
 
-int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, int syscall_family);
-int susfs_sus_path_by_filename(struct filename* name, int* errno_to_be_changed, int syscall_family);
-int susfs_sus_mount(struct vfsmount* mnt, struct path* root);
+int susfs_sus_path_by_path(const struct path *file, int *errno_to_be_changed, int syscall_family);
+int susfs_sus_path_by_filename(struct filename *name, int *errno_to_be_changed, int syscall_family);
+int susfs_sus_mount(struct vfsmount *mnt, struct path *root);
 int susfs_sus_ino_for_filldir64(unsigned long ino);
-void susfs_sus_kstat(unsigned long ino, struct stat* out_stat);
-int susfs_sus_maps(unsigned long target_ino, unsigned long target_address_size, unsigned long* orig_ino, dev_t* orig_dev, vm_flags_t* flags, unsigned long long* pgoff, struct vm_area_struct* vma, char* tmpname);
+void susfs_sus_kstat(unsigned long ino, struct stat *out_stat);
+int susfs_sus_maps(unsigned long target_ino, unsigned long target_address_size, unsigned long *orig_ino, dev_t *orig_dev, vm_flags_t *flags, unsigned long long *pgoff, struct vm_area_struct *vma, char *tmpname);
 void susfs_sus_proc_fd_link(char *pathname, int len);
 void susfs_try_umount(uid_t target_uid);
-void susfs_spoof_uname(struct new_utsname* tmp);
+void susfs_spoof_uname(struct new_utsname *tmp);
 
 void susfs_add_mnt_id_recorder(void);
 int susfs_get_fake_mnt_id(int mnt_id);
@@ -182,7 +197,7 @@ void susfs_remove_mnt_id_recorder(void);
 
 void susfs_set_log(bool enabled);
 
-void susfs_change_error_no_by_pathname(char* pathname, int* errno_to_be_changed, int syscall_family);
+void susfs_change_error_no_by_pathname(char *pathname, int *errno_to_be_changed, int syscall_family);
 
 void __init susfs_init(void);
 
