@@ -509,7 +509,7 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 	ptr = __d_path(&mnt_path, root, path, SUSFS_MAX_LEN_PATHNAME_PARSE);
 
 	if (!ptr) {
-		SUSFS_LOGE("sus_mount: d_path failed\n");
+		SUSFS_LOGE("sus_mount: __d_path failed\n");
 		goto out;
 	}
 
@@ -796,7 +796,7 @@ static void try_umount(const char *mnt, bool check_mnt, int flags) {
 	if (check_mnt && !should_umount(&path)) {
 		return;
 	}
-	
+
 	umount_mnt(&path, flags);
 }
 
