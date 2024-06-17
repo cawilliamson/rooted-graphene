@@ -4,9 +4,14 @@ set -e
 
 ### VARIABLES
 
+if [ "${#}" -ne 1 ]; then
+  echo "Usage: ${0} <device codename>"
+  exit 1
+fi
+
 # set static variables
 AVBROOT_VERSION="3.2.2"
-ROM_TARGET="felix"
+ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
@@ -117,9 +122,9 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # apply susfs (to KernelSU)
-    #pushd KernelSU/
-    #  git am ../../../patches/susfs/KernelSU/10_enable_susfs_for_ksu.patch
-    #popd
+    pushd KernelSU/
+      git am ../../../patches/susfs/KernelSU/10_enable_susfs_for_ksu.patch
+    popd
 
     # determine target kernel version
     if [ "${ROM_TARGET}" == "husky" ]; then
@@ -129,11 +134,11 @@ pushd kernel/
     fi
 
     # apply susfs to kernel
-    #git am "../../patches/susfs/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
+    git am "../../patches/susfs/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel
-    #cp -v "../../patches/susfs/${TARGET_KERNEL_VERSION}/fs/susfs.c" fs/
-    #cp -v "../../patches/susfs/${TARGET_KERNEL_VERSION}/include/linux/susfs.h" include/linux/
+    cp -v "../../patches/susfs/${TARGET_KERNEL_VERSION}/fs/susfs.c" fs/
+    cp -v "../../patches/susfs/${TARGET_KERNEL_VERSION}/include/linux/susfs.h" include/linux/
 
     # enable wireguard by default
     #git am "../../patches/wireguard/0001-Enable-wireguard-by-default.patch"
