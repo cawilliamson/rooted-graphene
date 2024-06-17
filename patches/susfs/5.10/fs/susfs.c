@@ -277,12 +277,6 @@ int susfs_add_sus_maps(struct st_susfs_sus_maps* __user user_info) {
 	list_add_tail(&new_list->list, &LH_MAPS_SPOOFER);
 	spin_unlock(&susfs_spin_lock);
 
-#endif /* defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_COMPAT_STAT64) */
-    INIT_LIST_HEAD(&new_list->list);
-    spin_lock(&susfs_spin_lock);
-    list_add_tail(&new_list->list, &LH_MAPS_SPOOFER);
-    spin_unlock(&susfs_spin_lock);
-
 	SUSFS_LOGI("is_statically: '%d', compare_mode: '%d', is_isolated_entry: '%d', is_file: '%d', prev_target_ino: '%lu', next_target_ino: '%lu', target_ino: '%lu', target_dev: '0x%x', target_pgoff: '0x%x', target_prot: '0x%x', target_addr_size: '0x%x', spoofed_pathname: '%s', spoofed_ino: '%lu', spoofed_dev: '0x%x', spoofed_pgoff: '0x%x', spoofed_prot: '0x%x', is successfully added to LH_MAPS_SPOOFER\n",
 	new_list->info.is_statically, new_list->info.compare_mode, new_list->info.is_isolated_entry,
 	new_list->info.is_file, new_list->info.prev_target_ino, new_list->info.next_target_ino,
