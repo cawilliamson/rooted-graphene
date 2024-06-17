@@ -420,7 +420,7 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 	ptr = d_path(file, path, PATH_MAX);
 
 	if (IS_ERR(ptr)) {
-		SUSFS_LOGE("sus_path: d_path failed\n");
+		SUSFS_LOGE("sus_path: d_path failed for path: %s\n", path);
 		goto out;
 	}
 
@@ -507,10 +507,10 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 		return status;
 	}
 
-	ptr = __d_path(&mnt_path, root, path, PATH_MAX);
+	ptr = d_path(&mnt_path, path, PATH_MAX);
 
-	if (!ptr) {
-		SUSFS_LOGE("sus_mount: __d_path failed\n");
+	if (IS_ERR(ptr)) {
+		SUSFS_LOGE("sus_mount: d_path failed for path: %s\n", path);
 		goto out;
 	}
 
