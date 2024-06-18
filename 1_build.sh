@@ -27,7 +27,7 @@ else
 fi
 
 ### CLEANUP PREVIOUS BUILDS
-rm -rfv kernel/ kernel-out/ rom/
+rm -rfv device_tmp/ kernel/ kernel_out/ rom/
 
 ### FUNCTIONS
 
@@ -170,9 +170,9 @@ popd
 
 # stash parts we need
 if [ "${ROM_TARGET}" == "husky" ]; then
-  mv -v "kernel/out/shusky/dist" "./kernel-out"
+  mv -v "kernel/out/shusky/dist" "./kernel_out"
 else
-  mv -v "kernel/out/mixed/dist" "./kernel-out"
+  mv -v "kernel/out/mixed/dist" "./kernel_out"
 fi
 
 # remove kernel sources to save space before rom clone
@@ -188,8 +188,8 @@ pushd rom/
   repo_sync_until_success
 
   # copy kernel sources
-  cp -Rfv ../kernel-out/* "device/google/${ROM_TARGET_GROUP}-kernel/"
-  rm -rf ../kernel-out
+  cp -Rfv ../kernel_out/* "device/google/${ROM_TARGET_GROUP}-kernel/"
+  rm -rf ../kernel_out
 
   # fetch vendor binaries
   yarnpkg install --cwd vendor/adevtool/
