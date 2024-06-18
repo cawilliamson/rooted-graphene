@@ -74,14 +74,14 @@ index 67f177f4..47f98f36 100644
 +	help
 +	  Allow spoofing the user-defined symbolic link in /proc/self/fd/
 +
-+config KSU_SUSFS_SUS_TRY_UMOUNT
++config KSU_SUSFS_TRY_UMOUNT
 +	bool "Enable to use ksu's try_umount"
 +	depends on KSU_SUSFS
 +	default y
 +	help
 +	  Allow using ksu's umount to umount other user-defined mount paths prior to ksu's default umount paths
 +
-+config KSU_SUSFS_SUS_SPOOF_UNAME
++config KSU_SUSFS_SPOOF_UNAME
 +	bool "Enable to spoof uname"
 +	depends on KSU_SUSFS
 +	default y
@@ -126,11 +126,11 @@ index 9fec3ef3..be858314 100644
 +ifdef KSU_SUSFS_SUS_PROC_FD_LINK
 +ccflags-y += -DKSU_SUSFS_SUS_PROC_FD_LINK
 +endif
-+ifdef KSU_SUSFS_SUS_TRY_UMOUNT
-+ccflags-y += -DKSU_SUSFS_SUS_TRY_UMOUNT
++ifdef KSU_SUSFS_TRY_UMOUNT
++ccflags-y += -DKSU_SUSFS_TRY_UMOUNT
 +endif
-+ifdef KSU_SUSFS_SUS_SPOOF_UNAME
-+ccflags-y += -DKSU_SUSFS_SUS_SPOOF_UNAME
++ifdef KSU_SUSFS_SPOOF_UNAME
++ccflags-y += -DKSU_SUSFS_SPOOF_UNAME
 +endif
 +ifdef KSU_SUSFS_ENABLE_LOG
 +ccflags-y += -DKSU_SUSFS_ENABLE_LOG
