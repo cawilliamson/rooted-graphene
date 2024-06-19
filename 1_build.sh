@@ -15,10 +15,10 @@ ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
-if [ "${ROM_TARGET}" == "akita" ] || [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
+if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
   # pixel 8a / pixel 8 / pixel 8 pro
   ROM_TARGET_GROUP="shusky"
-elif [ "${ROM_TARGET}" == "cheetah" ] || [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "lynx" ]; then
+elif [ "${ROM_TARGET}" == "cheetah" ] || [ "${ROM_TARGET}" == "panther" ]; then
   # pixel 7a / pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
 else
@@ -120,11 +120,6 @@ mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
   if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-    # REMOVE
-    echo "Temporarily disabled whilst I fix susfs for 5.15"
-    exit 1
-    # REMOVE
-
     repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
