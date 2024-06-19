@@ -14,7 +14,7 @@ apt install -y nginx
 
 # install custota
 pushd /var/tmp
-  curl -LSs "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_VERSION}/custota-${CUSTOTA_VERSION}-x86_64-unknown-linux-gnu.zip" > avbroot.zip
+  curl -LSs "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_VERSION}/custota-${CUSTOTA_VERSION}-x86_64-unknown-linux-gnu.zip" > custota.zip
   unzip -o -p custota.zip custota-tool > /usr/bin/custota-tool
   chmod +x /usr/bin/custota-tool
   rm -f custota.zip
