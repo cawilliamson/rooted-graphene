@@ -3,8 +3,8 @@
 #include <linux/path.h>
 #include <linux/slab.h>
 #include <linux/seq_file.h>
-#include <linux/dcache.h>
 #include <linux/printk.h>
+#include <linux/mount.h>
 #include <linux/namei.h>
 #include <linux/list.h>
 #include <linux/init_task.h>
@@ -14,7 +14,6 @@
 #include <linux/uaccess.h>
 #include <linux/version.h>
 #include <linux/susfs.h>
-#include <mount.h>
 
 LIST_HEAD(LH_SUS_PATH);
 LIST_HEAD(LH_KSTAT_SPOOFER);
