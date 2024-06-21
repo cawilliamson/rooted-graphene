@@ -1,6 +1,6 @@
-From 4b2e8aa31033400323e868c042d26804898e6c9e Mon Sep 17 00:00:00 2001
-From: "Christopher A. Williamson" <home@chrisaw.com>
-Date: Wed, 19 Jun 2024 11:33:04 +0100
+From c9237375e3d346b7b4c27384ae8aa4d8be4deb79 Mon Sep 17 00:00:00 2001
+From: Android Build <androidbuild@localhost>
+Date: Fri, 21 Jun 2024 19:50:48 +0100
 Subject: [PATCH] Add SUSFS in kernel
 
 ---
@@ -11,10 +11,10 @@ Subject: [PATCH] Add SUSFS in kernel
  fs/proc/task_mmu.c    |  23 ++++++++++
  fs/proc_namespace.c   |  41 ++++++++++++++++-
  fs/readdir.c          |  11 +++++
- fs/stat.c             |  11 +++++
+ fs/stat.c             |  15 +++++++
  include/linux/mount.h |   4 ++
  kernel/sys.c          |   9 ++++
- 10 files changed, 259 insertions(+), 3 deletions(-)
+ 10 files changed, 263 insertions(+), 3 deletions(-)
 
 diff --git a/fs/Makefile b/fs/Makefile
 index e4adb9882..de6a25d66 100644
@@ -487,10 +487,21 @@ index 09e8ed7d4..f56e7d99e 100644
  	prev = (void __user *)dirent - prev_reclen;
  	if (!user_write_access_begin(prev, reclen + prev_reclen))
 diff --git a/fs/stat.c b/fs/stat.c
-index 3e5be6702..774b0b157 100644
+index 3e5be6702..ccd29d76c 100644
 --- a/fs/stat.c
 +++ b/fs/stat.c
-@@ -154,6 +154,12 @@ int vfs_getattr(const struct path *path, struct kstat *stat,
+@@ -21,6 +21,10 @@
+ #include <linux/uaccess.h>
+ #include <asm/unistd.h>
+ 
++#ifdef CONFIG_KSU_SUSFS
++#include <linux/susfs.h>
++#endif
++
+ #include "internal.h"
+ #include "mount.h"
+ 
+@@ -154,6 +158,12 @@ int vfs_getattr(const struct path *path, struct kstat *stat,
  {
  	int retval;
  
@@ -503,7 +514,7 @@ index 3e5be6702..774b0b157 100644
  	retval = security_inode_getattr(path);
  	if (retval)
  		return retval;
-@@ -515,6 +521,11 @@ static long cp_new_stat64(struct kstat *stat, struct stat64 __user *statbuf)
+@@ -515,6 +525,11 @@ static long cp_new_stat64(struct kstat *stat, struct stat64 __user *statbuf)
  	tmp.st_size = stat->size;
  	tmp.st_blocks = stat->blocks;
  	tmp.st_blksize = stat->blksize;
@@ -558,5 +569,4 @@ index 4b2ebf822..26a9910d5 100644
  		return -EFAULT;
  
 -- 
-2.44.1
-
+2.43.0
