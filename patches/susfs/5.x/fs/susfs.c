@@ -13,6 +13,8 @@
 #include <linux/uaccess.h>
 #include <linux/version.h>
 #include <linux/susfs.h>
+#include <linux/nsproxy.h>
+#include <linux/mount.h>
 
 LIST_HEAD(LH_SUS_PATH);
 LIST_HEAD(LH_KSTAT_SPOOFER);
