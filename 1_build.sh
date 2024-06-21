@@ -56,12 +56,15 @@ export DEBIAN_FRONTEND=noninteractive
 apt update
 apt dist-upgrade -y
 apt install -y \
+  bison \
   build-essential \
   curl \
   expect \
+  flex \
   git \
   git-lfs \
   jq \
+  libncurses-dev \
   libssl-dev \
   openjdk-21-jdk-headless \
   python3 \
