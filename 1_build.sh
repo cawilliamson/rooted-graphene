@@ -16,10 +16,10 @@ export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
 if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-  # pixel 8a / pixel 8 / pixel 8 pro
+  # pixel 8 / pixel 8 pro
   ROM_TARGET_GROUP="shusky"
 elif [ "${ROM_TARGET}" == "cheetah" ] || [ "${ROM_TARGET}" == "panther" ]; then
-  # pixel 7a / pixel 7 / pixel 7 pro
+  # pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
 else
   # probably pixel fold
@@ -133,20 +133,23 @@ pushd kernel/
 
     # apply susfs (to KernelSU)
     pushd KernelSU/
+      echo "Applying SUSFS for KernelSU..."
       git am ../../../patches/susfs/KernelSU/10_enable_susfs_for_ksu.patch
     popd
 
     # determine target kernel version
-    if [ "${ROM_TARGET}" == "husky" ]; then
+    if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
       TARGET_KERNEL_VERSION="5.15"
     else
       TARGET_KERNEL_VERSION="5.10"
     fi
 
     # apply susfs to kernel
+    echo "Applying SUSFS for kernel..."
     git am "../../patches/susfs/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel (same for all 5.x kernels)
+    echo "Copying SUSFS files to kernel..."
     cp -v "../../patches/susfs/5.x/fs/susfs.c" fs/
     cp -v "../../patches/susfs/5.x/include/linux/susfs.h" include/linux/
 
@@ -164,7 +167,7 @@ pushd kernel/
 popd
 
 # stash parts we need
-if [ "${ROM_TARGET}" == "husky" ]; then
+if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
   mv -v "kernel/out/shusky/dist" "./kernel_out"
 else
   mv -v "kernel/out/mixed/dist" "./kernel_out"
