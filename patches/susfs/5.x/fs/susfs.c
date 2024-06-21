@@ -537,7 +537,7 @@ out:
 	return status;
 }
 
-void susfs_sus_kstat(unsigned long ino, struct stat* out_stat) {
+void susfs_sus_kstat(unsigned long ino, struct stat64* out_stat) {
 	struct st_susfs_sus_kstat_list *cursor, *temp;
 
 	if (!uid_matches_suspicious_kstat()) return;
