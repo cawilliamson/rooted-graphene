@@ -8,7 +8,6 @@
 #include <linux/namei.h>
 #include <linux/list.h>
 #include <linux/init_task.h>
-#include <linux/limits.h>
 #include <linux/spinlock.h>
 #include <linux/stat.h>
 #include <linux/uaccess.h>
@@ -410,14 +409,14 @@ int susfs_sus_path_by_path(const struct path* file, int* errno_to_be_changed, in
 		return status; // status == 0
 	}
 
-	path = kmalloc(PATH_MAX, GFP_KERNEL);
+	path = kmalloc(SUSFS_DPATH_BUF_LEN, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_path: kmalloc failed\n");
 		return status; // status == 0
 	}
 
-	ptr = d_path(file, path, PATH_MAX);
+	ptr = d_path(file, path, SUSFS_DPATH_BUF_LEN);
 
 	if (IS_ERR(ptr)) {
 		SUSFS_LOGE("sus_path: d_path failed for path: %s\n", path);
@@ -500,14 +499,14 @@ int susfs_sus_mount(struct vfsmount* mnt, struct path* root) {
 
 	//if (!uid_matches_suspicious_mount()) return status;
 
-	path = kmalloc(PATH_MAX, GFP_KERNEL);
+	path = kmalloc(SUSFS_DPATH_BUF_LEN, GFP_KERNEL);
 
 	if (path == NULL) {
 		SUSFS_LOGE("sus_mount: kmalloc failed\n");
 		return status; // status == 0
 	}
 
-	ptr = d_path(&mnt_path, path, PATH_MAX);
+	ptr = d_path(&mnt_path, path, SUSFS_DPATH_BUF_LEN);
 
 	if (IS_ERR(ptr)) {
 		SUSFS_LOGE("sus_mount: d_path failed for path: %s\n", path);
@@ -1012,7 +1011,7 @@ void susfs_add_mnt_id_recorder(void) {
 		return;
 	}
 
-	path = kmalloc(PATH_MAX, GFP_KERNEL);
+	path = kmalloc(SUSFS_DPATH_BUF_LEN, GFP_KERNEL);
 	if (path == NULL) {
 		SUSFS_LOGE("No enough memory\n");
 		kfree(new_list);
@@ -1024,7 +1023,7 @@ void susfs_add_mnt_id_recorder(void) {
 	list_for_each_entry(mnt, &ns->list, mnt_list) {
 		mnt_path.dentry = mnt->mnt.mnt_root;
 		mnt_path.mnt = &mnt->mnt;
-		p_path = d_path(&mnt_path, path, PATH_MAX);
+		p_path = d_path(&mnt_path, path, SUSFS_DPATH_BUF_LEN);
 		if (IS_ERR(p_path)) {
 			SUSFS_LOGE("d_path() failed\n");
 			continue;

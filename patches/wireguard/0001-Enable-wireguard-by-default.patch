@@ -1,0 +1,23 @@
+From 1a7ebe2051a2f5927b83c3e2dda6d72ee2a82a13 Mon Sep 17 00:00:00 2001
+From: "Christopher A. Williamson" <home@chrisaw.com>
+Date: Fri, 14 Jun 2024 15:48:59 +0100
+Subject: [PATCH] Enable wireguard by default
+
+---
+ drivers/net/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index 72d85214e..736bbccdb 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -73,6 +73,7 @@ config DUMMY
+
+ config WIREGUARD
+ 	tristate "WireGuard secure network tunnel"
++	default y
+ 	depends on NET && INET
+ 	depends on IPV6 || !IPV6
+ 	select NET_UDP_TUNNEL
+-- 
+2.44.1
