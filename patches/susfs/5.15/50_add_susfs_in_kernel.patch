@@ -1,10 +1,10 @@
-From c9237375e3d346b7b4c27384ae8aa4d8be4deb79 Mon Sep 17 00:00:00 2001
+From 24178dc00850cd34353942db0bc9d40a2ecb69be Mon Sep 17 00:00:00 2001
 From: Android Build <androidbuild@localhost>
-Date: Fri, 21 Jun 2024 19:50:48 +0100
+Date: Fri, 21 Jun 2024 23:12:05 +0100
 Subject: [PATCH] Add SUSFS in kernel
 
 ---
- fs/Makefile           |   7 ++-
+ fs/Makefile           |   2 +
  fs/namei.c            | 101 ++++++++++++++++++++++++++++++++++++++++++
  fs/open.c             |  46 +++++++++++++++++++
  fs/proc/base.c        |   9 ++++
@@ -14,7 +14,7 @@ Subject: [PATCH] Add SUSFS in kernel
  fs/stat.c             |  15 +++++++
  include/linux/mount.h |   4 ++
  kernel/sys.c          |   9 ++++
- 10 files changed, 263 insertions(+), 3 deletions(-)
+ 10 files changed, 260 insertions(+), 1 deletion(-)
 
 diff --git a/fs/Makefile b/fs/Makefile
 index e4adb9882..2461d8986 100644
@@ -27,9 +27,8 @@ index e4adb9882..2461d8986 100644
 +obj-$(CONFIG_KSU_SUSFS) += susfs.o
 +
  ifeq ($(CONFIG_BLOCK),y)
- obj-y +=       buffer.o direct-io.o mpage.o
+ obj-y +=	buffer.o direct-io.o mpage.o
  else
-
 diff --git a/fs/namei.c b/fs/namei.c
 index a3922d96f..6edd5b74e 100644
 --- a/fs/namei.c
@@ -566,3 +565,4 @@ index 4b2ebf822..26a9910d5 100644
  
 -- 
 2.43.0
+
