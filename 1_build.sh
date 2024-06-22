@@ -163,6 +163,10 @@ pushd kernel/
 
     # enable wireguard by default
     git am "../../patches/wireguard/5.x/0001-Enable-wireguard-by-default.patch"
+    if [ "${TARGET_KERNEL_VERSION}" == "5.15" ]; then
+      # needed because defconfig isnt expecting wireguard
+      git am "../../patches/wireguard/5.15/0001-Disable-defconfig-check.patch"
+    fi
   popd
 
   # build kernel
