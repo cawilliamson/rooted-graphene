@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "susfs.h": "c",
+        "version.h": "c"
+    }
+}
