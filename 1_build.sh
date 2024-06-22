@@ -12,7 +12,6 @@ fi
 ### RESYNC THIS REPO
 # This is because the creator of this is forgetful and
 # NEVER remembers to sync again before running a build! :/
-git reset --hard
 git pull
 
 # set static variables
