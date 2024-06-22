@@ -14,11 +14,6 @@
 #include <linux/susfs.h>
 #include <mount.h>
 
-//#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
-//#include <linux/nsproxy.h>
-//#include <linux/mount.h>
-//#endif
-
 LIST_HEAD(LH_SUS_PATH);
 LIST_HEAD(LH_KSTAT_SPOOFER);
 LIST_HEAD(LH_SUS_MOUNT);
