@@ -537,7 +537,11 @@ out:
 	return status;
 }
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(5, 15, 0)
+void susfs_sus_kstat(unsigned long ino, struct stat* out_stat) {
+#else
 void susfs_sus_kstat(unsigned long ino, struct stat64* out_stat) {
+#endif
 	struct st_susfs_sus_kstat_list *cursor, *temp;
 
 	if (!uid_matches_suspicious_kstat()) return;
