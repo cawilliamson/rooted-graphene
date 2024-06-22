@@ -4,6 +4,7 @@
 #include <linux/types.h>
 #include <linux/utsname.h>
 #include <linux/mount.h>
+#include <linux/version.h>
 
 /* shared with userspace ksu_susfs tool */
 #define CMD_SUSFS_ADD_SUS_PATH 0x55555
