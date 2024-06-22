@@ -142,7 +142,7 @@ pushd kernel/
     # apply susfs (to KernelSU)
     pushd KernelSU/
       echo "Applying SUSFS for KernelSU..."
-      git am ../../../patches/susfs/KernelSU/10_enable_susfs_for_ksu.patch
+      patch -p1 < ../../../patches/susfs/KernelSU/10_enable_susfs_for_ksu.patch
     popd
 
     # determine target kernel version
@@ -154,7 +154,7 @@ pushd kernel/
 
     # apply susfs to kernel
     echo "Applying SUSFS for kernel..."
-    git am "../../patches/susfs/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
+    patch -p1 < "../../patches/susfs/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel (same for all 5.x kernels)
     echo "Copying SUSFS files to kernel..."
@@ -162,8 +162,8 @@ pushd kernel/
     cp -v "../../patches/susfs/5.x/include/linux/susfs.h" include/linux/
 
     # enable wireguard by default
-    git am "../../patches/wireguard/5.x/0001-Disable-defconfig-check.patch"
-    git am "../../patches/wireguard/5.x/0002-Enable-wireguard-by-default.patch"
+    patch -p1 < "../../patches/wireguard/5.x/0001-Disable-defconfig-check.patch"
+    patch -p1 < "../../patches/wireguard/5.x/0002-Enable-wireguard-by-default.patch"
   popd
 
   # build kernel
