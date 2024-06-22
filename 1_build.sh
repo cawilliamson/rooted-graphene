@@ -29,6 +29,12 @@ fi
 ### CLEANUP PREVIOUS BUILDS
 rm -rfv device_tmp/ kernel/ kernel_out/ rom/
 
+### RESYNC THIS REPO
+# This is because the creator of this is forgetful and
+# NEVER remembers to sync again before running a build! :/
+git reset --hard
+git pull
+
 ### FUNCTIONS
 
 # Function to run repo sync until successful
