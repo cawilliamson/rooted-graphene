@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 ### CLEANUP BUILD
-rm -rfv kernel/ kernel-out/ rom/
+rm -rfv device_tmp/ kernel/ kernel_out/ rom/

@@ -9,6 +9,12 @@ if [ "${#}" -ne 1 ]; then
   exit 1
 fi
 
+### RESYNC THIS REPO
+# This is because the creator of this is forgetful and
+# NEVER remembers to sync again before running a build! :/
+git reset --hard
+git pull
+
 # set static variables
 AVBROOT_VERSION="3.2.2"
 ROM_TARGET="${1}"
@@ -28,12 +34,6 @@ fi
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rfv device_tmp/ kernel/ kernel_out/ rom/
-
-### RESYNC THIS REPO
-# This is because the creator of this is forgetful and
-# NEVER remembers to sync again before running a build! :/
-git reset --hard
-git pull
 
 ### FUNCTIONS
 
