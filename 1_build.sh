@@ -162,11 +162,8 @@ pushd kernel/
     cp -v "../../patches/susfs/5.x/include/linux/susfs.h" include/linux/
 
     # enable wireguard by default
-    git am "../../patches/wireguard/5.x/0001-Enable-wireguard-by-default.patch"
-    if [ "${TARGET_KERNEL_VERSION}" == "5.15" ]; then
-      # needed because defconfig isnt expecting wireguard
-      git am "../../patches/wireguard/5.15/0001-Disable-defconfig-check.patch"
-    fi
+    git am "../../patches/wireguard/5.x/0001-Disable-defconfig-check.patch"
+    git am "../../patches/wireguard/5.x/0002-Enable-wireguard-by-default.patch"
   popd
 
   # build kernel

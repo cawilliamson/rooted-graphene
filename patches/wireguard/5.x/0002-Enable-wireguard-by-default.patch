@@ -1,7 +1,7 @@
 From 1a7ebe2051a2f5927b83c3e2dda6d72ee2a82a13 Mon Sep 17 00:00:00 2001
 From: "Christopher A. Williamson" <home@chrisaw.com>
 Date: Fri, 14 Jun 2024 15:48:59 +0100
-Subject: [PATCH] Enable wireguard by default
+Subject: [PATCH 2/2] Enable wireguard by default
 
 ---
  drivers/net/Kconfig | 1 +
