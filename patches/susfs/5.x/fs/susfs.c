@@ -4,7 +4,6 @@
 #include <linux/slab.h>
 #include <linux/seq_file.h>
 #include <linux/printk.h>
-#include <linux/mount.h>
 #include <linux/namei.h>
 #include <linux/list.h>
 #include <linux/init_task.h>
@@ -15,8 +14,7 @@
 #include <linux/susfs.h>
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
-#include <linux/nsproxy.h>
-#include <linux/mount.h>
+#include <linux/fs/mount.h>
 #endif
 
 LIST_HEAD(LH_SUS_PATH);
