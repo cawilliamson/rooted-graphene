@@ -26,9 +26,12 @@ if [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ]; then
 elif [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "cheetah" ]; then
   # pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
-else
-  # probably pixel fold
+elif [ "${ROM_TARGET}" == "felix" ]]; then
+  # pixel fold
   ROM_TARGET_GROUP="${ROM_TARGET}"
+else
+  echo "Unsupported device codename"
+  exit 1
 fi
 
 ### CLEANUP PREVIOUS BUILDS
