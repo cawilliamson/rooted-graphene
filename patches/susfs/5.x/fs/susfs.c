@@ -1048,12 +1048,12 @@ void susfs_add_mnt_id_recorder(void) {
 				break;
 			}
 		}
+	}
 
-		kfree(path);
-		if (new_list->info.count == 0) {
-			kfree(new_list);
-			return;
-		}
+	kfree(path);
+	if (new_list->info.count == 0) {
+		kfree(new_list);
+		return;
 	}
 
 	INIT_LIST_HEAD(&new_list->list);
