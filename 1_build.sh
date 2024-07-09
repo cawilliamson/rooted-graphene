@@ -143,7 +143,7 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # fetch susfs
-    git clone "https://gitlab.com/chrisaw/susfs4ksu" -b feature/add-kernel-5-support
+    git clone "https://gitlab.com/chrisaw/susfs4ksu"
 
     # apply susfs (to KernelSU)
     pushd KernelSU/
