@@ -35,7 +35,7 @@ else
 fi
 
 ### CLEANUP PREVIOUS BUILDS
-rm -rfv device_tmp/ kernel/ kernel_out/ rom/
+rm -rf device_tmp/ kernel/ kernel_out/ rom/
 
 ### FUNCTIONS
 
