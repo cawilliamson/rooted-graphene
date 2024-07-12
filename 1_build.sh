@@ -8,6 +8,8 @@ if [ "${#}" -ne 1 ]; then
   echo "Usage: ${0} <device codename>"
   exit 1
 fi
+echo type "nala" or "$installer" (or apt-get, etc)
+read installer
 
 ### RESYNC THIS REPO
 # This is because the creator of this is forgetful and
@@ -26,6 +28,9 @@ if [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ]; then
 elif [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "cheetah" ]; then
   # pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
+elif [ "${ROM_TARGET}" == "oriole" ] || [ "${ROM_TARGET}" == "raven" ]; then
+  # pixel 6 / pixel 6 pro
+  ROM_TARGET_GROUP="raviole"
 elif [ "${ROM_TARGET}" == "felix" ]; then
   # pixel fold
   ROM_TARGET_GROUP="${ROM_TARGET}"
@@ -57,13 +62,13 @@ function repo_sync_until_success() {
 
 ### SETUP BUILD SYSTEM
 
-# set apt to noninteractive mode
+# set $installer to noninteractive mode
 export DEBIAN_FRONTEND=noninteractive
 
-# install all apt dependencies
-apt update
-apt dist-upgrade -y
-apt install -y \
+# install all $installer dependencies
+$installer update
+$installer dist-upgrade -y
+$installer install -y \
   bison \
   build-essential \
   curl \
@@ -176,6 +181,9 @@ pushd kernel/
   if [ "${ROM_TARGET_GROUP}" == "pantah" ]; then
     # no idea why this is cloudripper.... D:
     BUILD_AOSP_KERNEL=1 LTO=full ./build_cloudripper.sh
+  elif [ "${ROM_TARGET_GROUP}" == "oriole" ]; then
+    # no idea why this is slider.... D:
+    BUILD_AOSP_KERNEL=1 LTO=full ./build_slider.sh
   else
     BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
   fi
@@ -214,8 +222,8 @@ pushd rom/
   TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
   export TARGET_RELEASE
 
-  # build aapt2
-  m aapt2
+  # build apt2
+  m apt2
 
   # fetch vendor binaries
   ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
