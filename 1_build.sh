@@ -222,8 +222,8 @@ pushd rom/
   TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
   export TARGET_RELEASE
 
-  # build apt2
-  m apt2
+  # build aapt2
+  m aapt2
 
   # fetch vendor binaries
   ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
