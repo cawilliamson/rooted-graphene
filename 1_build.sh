@@ -118,6 +118,9 @@ git clone "https://github.com/GrapheneOS/device_google_${ROM_TARGET_GROUP}.git" 
 # determine tag
 pushd device_tmp
   GRAPHENE_RELEASE=$(git describe --tags --abbrev=0)
+
+  # remove any extension (like "-redfin" for example)
+  GRAPHENE_RELEASE="${GRAPHENE_RELEASE%%-*}"
   export GRAPHENE_RELEASE
 popd
 
