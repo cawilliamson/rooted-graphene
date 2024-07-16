@@ -122,6 +122,9 @@ pushd device_tmp
   # remove any extension (like "-redfin" for example)
   GRAPHENE_RELEASE="${GRAPHENE_RELEASE%%-*}"
   export GRAPHENE_RELEASE
+
+  # write out status
+  echo "Building GrapheneOS release: ${GRAPHENE_RELEASE}"
 popd
 
 # cleanup device sources
