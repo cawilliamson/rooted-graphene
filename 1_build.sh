@@ -137,9 +137,9 @@ mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
   if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
   else
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
   fi
   repo_sync_until_success
 
