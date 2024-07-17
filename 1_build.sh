@@ -15,7 +15,7 @@ fi
 git pull
 
 # set static variables
-AVBROOT_VERSION="3.2.2"
+AVBROOT_VERSION="3.4.0"
 ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
