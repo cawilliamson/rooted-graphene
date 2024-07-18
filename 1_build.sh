@@ -137,9 +137,9 @@ mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
   if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   else
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   fi
   repo_sync_until_success
 
@@ -169,9 +169,9 @@ pushd kernel/
     #patch -p1 < "susfs4ksu/kernel_patches/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel (same for all kernels)
-    echo "Copying SUSFS files to kernel..."
-    cp -v "susfs4ksu/kernel_patches/SUSFS/fs/susfs.c" fs/
-    cp -v "susfs4ksu/kernel_patches/SUSFS/include/linux/susfs.h" include/linux/
+    #echo "Copying SUSFS files to kernel..."
+    #cp -v "susfs4ksu/kernel_patches/SUSFS/fs/susfs.c" fs/
+    #cp -v "susfs4ksu/kernel_patches/SUSFS/include/linux/susfs.h" include/linux/
 
     # enable wireguard by default
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
