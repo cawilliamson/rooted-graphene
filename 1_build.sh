@@ -183,6 +183,8 @@ pushd kernel/
     # no idea why this is cloudripper.... D:
     BUILD_AOSP_KERNEL=1 LTO=full ./build_cloudripper.sh
   else
+    # pixel 8 should use:
+    #./build_shusky.sh --config=use_source_tree_aosp --config=no_download_gki --disable_32bit --lto=full
     BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
   fi
 popd
@@ -228,6 +230,8 @@ pushd rom/
 
   # start build
   lunch "${ROM_TARGET}-${TARGET_RELEASE}-user"
+  # pixel 6:
+  #m vendorbootimage target-files-package
   m vendorbootimage vendorkernelbootimage target-files-package
 
   # generate keys
