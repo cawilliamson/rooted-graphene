@@ -149,13 +149,13 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # fetch susfs
-    git clone "https://gitlab.com/chrisaw/susfs4ksu"
+    #git clone "https://gitlab.com/chrisaw/susfs4ksu"
 
     # apply susfs (to KernelSU)
-    pushd KernelSU/
-      echo "Applying SUSFS for KernelSU..."
-      patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
-    popd
+    #pushd KernelSU/
+    #  echo "Applying SUSFS for KernelSU..."
+    #  patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+    #popd
 
     # determine target kernel version
     if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
@@ -165,8 +165,8 @@ pushd kernel/
     fi
 
     # apply susfs to kernel
-    echo "Applying SUSFS for kernel..."
-    patch -p1 < "susfs4ksu/kernel_patches/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
+    #echo "Applying SUSFS for kernel..."
+    #patch -p1 < "susfs4ksu/kernel_patches/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
 
     # copy susfs files to kernel (same for all kernels)
     echo "Copying SUSFS files to kernel..."
