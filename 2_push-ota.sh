@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # set static variables
-CUSTOTA_VERSION="4.4"
+CUSTOTA_VERSION="4.5"
 export CUSTOTA_VERSION
 
 # load in avbroot passwords

@@ -17,7 +17,7 @@ read installer
 git pull
 
 # set static variables
-AVBROOT_VERSION="3.2.2"
+AVBROOT_VERSION="3.4.0"
 ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
@@ -123,7 +123,13 @@ git clone "https://github.com/GrapheneOS/device_google_${ROM_TARGET_GROUP}.git" 
 # determine tag
 pushd device_tmp
   GRAPHENE_RELEASE=$(git describe --tags --abbrev=0)
+
+  # remove any extension (like "-redfin" for example)
+  GRAPHENE_RELEASE="${GRAPHENE_RELEASE%%-*}"
   export GRAPHENE_RELEASE
+
+  # write out status
+  echo "Building GrapheneOS release: ${GRAPHENE_RELEASE}"
 popd
 
 # cleanup device sources
@@ -136,13 +142,13 @@ mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
   if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b 14 --depth=1 --git-lfs
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   else
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b 14 --depth=1 --git-lfs
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   fi
   repo_sync_until_success
 
-  # fetch & apply ksu and susfs patches
+  # fetch & apply ksu and \susfs patches
   pushd aosp/
     # apply kernelsu
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
@@ -185,6 +191,8 @@ pushd kernel/
     # no idea why this is slider.... D:
     BUILD_AOSP_KERNEL=1 LTO=full ./build_slider.sh
   else
+    # pixel 8 should use:
+    #./build_shusky.sh --config=use_source_tree_aosp --config=no_download_gki --disable_32bit --lto=full
     BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
   fi
 popd
@@ -230,6 +238,8 @@ pushd rom/
 
   # start build
   lunch "${ROM_TARGET}-${TARGET_RELEASE}-user"
+  # pixel 6:
+  #m vendorbootimage target-files-package
   m vendorbootimage vendorkernelbootimage target-files-package
 
   # generate keys
