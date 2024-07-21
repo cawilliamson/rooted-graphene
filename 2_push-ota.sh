@@ -7,10 +7,10 @@ export CUSTOTA_VERSION
 # load in avbroot passwords
 . $HOME/.avbroot/passwords.sh
 
-# install all apt dependencies
-apt update
-apt dist-upgrade -y
-apt install -y nginx
+# install all $installer dependencies
+$installer update
+$installer dist-upgrade -y
+$installer install -y nginx
 
 # install custota
 pushd /var/tmp
