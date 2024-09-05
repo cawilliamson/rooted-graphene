@@ -252,7 +252,7 @@ pushd rom/
   popd
 
   # encrypt keys
-  expect ../expect/passphrase-prompts.exp ./script/encrypt_keys.sh ./keys/${ROM_TARGET}
+  expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh ./keys/${ROM_TARGET}
 
   # generate ota package
   m otatools-package
