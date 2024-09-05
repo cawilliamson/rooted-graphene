@@ -257,6 +257,9 @@ pushd rom/
   # generate ota package
   m otatools-package
 
+  # finalize
+  expect ../expect/passphrase-prompts.exp script/finalize.sh
+
   # build release
   expect ../expect/passphrase-prompts.exp script/generate-release.sh ${ROM_TARGET}
 popd
