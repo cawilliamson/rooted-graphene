@@ -266,4 +266,4 @@ popd
 
 # Write output
 echo "The file you are likely looking for is:"
-ls rom/out/release-*/*ota_update*.zip
+ls rom/releases/${BUILD_NUMBER}/release-${ROM_TARGET}-${BUILD_NUMBER}/${ROM_TARGET}-ota_update-${BUILD_NUMBER}.zip
