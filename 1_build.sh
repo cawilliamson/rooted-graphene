@@ -261,7 +261,7 @@ pushd rom/
   expect ../expect/passphrase-prompts.exp script/finalize.sh
 
   # build release
-  expect ../expect/passphrase-prompts.exp script/generate-release.sh ${ROM_TARGET}
+  expect ../expect/passphrase-prompts.exp script/generate-release.sh ${ROM_TARGET} ${BUILD_NUMBER}
 popd
 
 # Write output
