@@ -260,15 +260,18 @@ pushd rom/
   popd
 
   # encrypt keys
-  expect ../expect/passphrase-prompts.exp ./script/encrypt_keys.sh ./keys/${ROM_TARGET}
+  expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh ./keys/${ROM_TARGET}
 
   # generate ota package
   m otatools-package
 
+  # finalize
+  expect ../expect/passphrase-prompts.exp script/finalize.sh
+
   # build release
-  expect ../expect/passphrase-prompts.exp script/release.sh ${ROM_TARGET}
+  expect ../expect/passphrase-prompts.exp script/generate-release.sh ${ROM_TARGET} ${BUILD_NUMBER}
 popd
 
 # Write output
 echo "The file you are likely looking for is:"
-ls rom/out/release-*/*ota_update*.zip
+ls rom/releases/${BUILD_NUMBER}/release-${ROM_TARGET}-${BUILD_NUMBER}/${ROM_TARGET}-ota_update-${BUILD_NUMBER}.zip
