@@ -1,3 +1,31 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      device_codename:
+        description: 'Device codename'
+        required: true
+
 jobs:
-  runs-on: ubuntu-latest
-  run: bash -c './1_build.sh shiba && ./2_push-ota.sh && ./3_cleanup.sh'
+  run-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          chmod +x 1_build.sh
+          ./1_build.sh ${{ inputs.device_codename }}
+
+      - name: Push OTA
+        run: |
+          chmod +x 2_push-ota.sh
+          ./2_push-ota.sh
+
+      - name: Cleanup
+        run: |
+          chmod +x 3_cleanup.sh
+          ./3_cleanup.sh
+
