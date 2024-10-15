@@ -1,4 +1,4 @@
-name: Build
+name: Run Scripts
 
 on:
   workflow_dispatch:
@@ -14,18 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build
+      - name: Run 1_build.sh
         run: |
-          chmod +x 1_build.sh
-          ./1_build.sh ${{ inputs.device_codename }}
+          bash 1_build.sh ${{ inputs.device_codename }}
 
-      - name: Push OTA
+      - name: Run 2_push-ota.sh
         run: |
-          chmod +x 2_push-ota.sh
-          ./2_push-ota.sh
+          bash 2_push-ota.sh
 
-      - name: Cleanup
+      - name: Run 3_cleanup.sh
         run: |
-          chmod +x 3_cleanup.sh
-          ./3_cleanup.sh
-
+          bash 3_cleanup.sh
