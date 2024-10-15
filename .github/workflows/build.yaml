@@ -1,0 +1,9 @@
+jobs:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Build
+    run: bash -c '. 1_build.sh shiba'
+    - name: Push OTA
+    run: bash -c '. 2_push-ota.sh'
+    - name: Cleanup
+    run: bash -c '. 3_cleanup.sh'
