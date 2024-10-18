@@ -136,7 +136,7 @@ rm -rf device_tmp/
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ] || [ "$ROM_TARGET" == "akita"]; then
+  if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "akita" ]; then
     repo init -u https://github.com/GrapheneOS/kernel_manifest-zuma.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
