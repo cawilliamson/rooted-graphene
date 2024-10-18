@@ -22,7 +22,7 @@ export AVBROOT_VERSION ROM_TARGET
 # determine rom target code
 if [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "akita" ]; then
   # pixel 8 / pixel 8 pro / pixel 8a
-  ROM_TARGET_GROUP="zuma"
+  ROM_TARGET_GROUP="shusky"
 elif [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "cheetah" ]; then
   # pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
@@ -136,7 +136,7 @@ rm -rf device_tmp/
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "akita" ]; then
+  if [ "${ROM_TARGET_GROUP}" == "zuma" ]; then
     repo init -u https://github.com/GrapheneOS/kernel_manifest-zuma.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
