@@ -8,7 +8,7 @@ if [ "${#}" -ne 1 ]; then
   echo "Usage: ${0} <device codename>"
   exit 1
 fi
-echo type "nala" or "$installer" (or apt-get, etc)
+echo type "nala" or "apt" (or apt-get, etc)
 read installer
 
 ### RESYNC THIS REPO
