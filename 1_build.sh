@@ -20,9 +20,9 @@ ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
-if [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ]; then
-  # pixel 8 / pixel 8 pro
-  ROM_TARGET_GROUP="shusky"
+if [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "akita" ]; then
+  # pixel 8 / pixel 8 pro / pixel 8a
+  ROM_TARGET_GROUP="zuma"
 elif [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "cheetah" ]; then
   # pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
