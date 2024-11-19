@@ -20,14 +20,17 @@ ROM_TARGET="${1}"
 export AVBROOT_VERSION ROM_TARGET
 
 # determine rom target code
-if [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ]; then
+if [ "${ROM_TARGET}" == "tokay" ] || [ "${ROM_TARGET}" == "caiman" ] || [ "${ROM_TARGET}" == "komodo" ]; then
+  # pixel 9 / pixel 9 pro / pixel 9 pro xl
+  ROM_TARGET_GROUP="zumapro"
+elif [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ]; then
   # pixel 8 / pixel 8 pro
   ROM_TARGET_GROUP="shusky"
 elif [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "cheetah" ]; then
   # pixel 7 / pixel 7 pro
   ROM_TARGET_GROUP="pantah"
-elif [ "${ROM_TARGET}" == "felix" ]; then
-  # pixel fold
+elif [ "${ROM_TARGET}" == "felix" ] || [ "${ROM_TARGET}" == "comet" ]; then
+  # pixel fold / pixel 9 pro fold
   ROM_TARGET_GROUP="${ROM_TARGET}"
 else
   echo "Unsupported device codename"
@@ -136,7 +139,9 @@ rm -rf device_tmp/
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
+  if [ "${ROM_TARGET}" == "comet" ]; then
+    repo init -u https://github.com/GrapheneOS/kernel_manifest-zumapro.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
+  elif [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
     repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   else
     repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
@@ -149,16 +154,18 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # fetch susfs
-    git clone "https://gitlab.com/chrisaw/susfs4ksu"
+    git clone "https://gitlab.com/simonpunk/susfs4ksu.git" -b gki-android14-5.15
 
     # apply susfs (to KernelSU)
     pushd KernelSU/
       echo "Applying SUSFS for KernelSU..."
-      patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+      patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" # works! :)
     popd
 
     # determine target kernel version
-    if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
+    if [ "${ROM_TARGET}" == "comet" ]; then
+      TARGET_KERNEL_VERSION="6.1"
+    elif [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
       TARGET_KERNEL_VERSION="5.15"
     else
       TARGET_KERNEL_VERSION="5.10"
@@ -190,7 +197,9 @@ pushd kernel/
 popd
 
 # stash parts we need
-if [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
+if [ "${ROM_TARGET}" == "comet" ]; then
+  mv -v "kernel/out/zumapro/dist" "./kernel_out"
+elif [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
   mv -v "kernel/out/shusky/dist" "./kernel_out"
 else
   mv -v "kernel/out/mixed/dist" "./kernel_out"
