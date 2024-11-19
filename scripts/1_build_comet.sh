@@ -2,13 +2,12 @@
 
 set -e
 
-### RESYNC THIS REPO
-# This is because the creator of this is forgetful and
-# NEVER remembers to sync again before running a build! :/
-git pull
-
 ### CLEANUP PREVIOUS BUILDS
-rm -rf device_tmp/ kernel/ kernel_out/ rom/
+rm -rf \
+  device_tmp/ \
+  kernel/ \
+  kernel_out/ \
+  rom/
 
 ### FUNCTIONS
 
@@ -180,8 +179,6 @@ pushd rom/
 
   # start build
   lunch "comet-${TARGET_RELEASE}-user"
-  # pixel 6:
-  #m vendorbootimage target-files-package
   m vendorbootimage vendorkernelbootimage target-files-package
 
   # generate keys
