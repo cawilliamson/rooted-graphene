@@ -170,7 +170,8 @@ pushd rom/
   repo_sync_until_success
 
   # copy kernel sources
-  cp -Rfv ../kernel_out/* "device/google/comet-kernel/"
+  KERNEL_DIR=$(ls device/google/comet-kernels/6.1 | grep -v '.git')
+  cp -Rfv ../kernel_out/* "device/google/comet-kernels/6.1/${KERNEL_DIR}/"
   rm -rf ../kernel_out
 
   # fetch vendor binaries
