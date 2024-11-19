@@ -133,7 +133,7 @@ pushd kernel/
 
     # apply susfs to kernel
     echo "Applying SUSFS for kernel..."
-    patch -p1 < "susfs4ksu/kernel_patches/50_add_susfs_in_kernel-6.1.patch"
+    patch -p1 < "susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch"
 
     # copy susfs files to kernel (same for all kernels)
     echo "Copying susfs files to kernel..."
