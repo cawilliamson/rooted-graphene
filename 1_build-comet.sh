@@ -114,7 +114,6 @@ mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
   repo init -u https://github.com/GrapheneOS/kernel_manifest-zumapro.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
-  
   repo_sync_until_success
 
   # fetch & apply ksu and \susfs patches
@@ -156,7 +155,7 @@ pushd kernel/
 popd
 
 # stash parts we need
-mv -v "kernel/out/zumapro/dist" "./kernel_out"
+mv -v "kernel/out/comet/dist" "./kernel_out"
 
 # remove kernel sources to save space before rom clone
 rm -rf kernel/
