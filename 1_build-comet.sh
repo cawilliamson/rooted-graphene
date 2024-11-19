@@ -123,7 +123,7 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # fetch susfs
-    git clone "https://gitlab.com/cawilliamson/susfs4ksu.git" -b gki-android14-6.1
+    git clone --depth=1 "https://github.com/cawilliamson/susfs4ksu.git" -b gki-android14-6.1
 
     # apply susfs to KernelSU
     pushd KernelSU/
