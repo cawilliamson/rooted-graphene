@@ -2,40 +2,14 @@
 
 set -e
 
-### VARIABLES
-
-if [ "${#}" -ne 1 ]; then
-  echo "Usage: ${0} <device codename>"
-  exit 1
-fi
-
 ### RESYNC THIS REPO
 # This is because the creator of this is forgetful and
 # NEVER remembers to sync again before running a build! :/
 git pull
 
 # set static variables
-AVBROOT_VERSION="3.4.0"
-ROM_TARGET="${1}"
-export AVBROOT_VERSION ROM_TARGET
-
-# determine rom target code
-if [ "${ROM_TARGET}" == "tokay" ] || [ "${ROM_TARGET}" == "caiman" ] || [ "${ROM_TARGET}" == "komodo" ]; then
-  # pixel 9 / pixel 9 pro / pixel 9 pro xl
-  ROM_TARGET_GROUP="zumapro"
-elif [ "${ROM_TARGET}" == "shiba" ] || [ "${ROM_TARGET}" == "husky" ]; then
-  # pixel 8 / pixel 8 pro
-  ROM_TARGET_GROUP="shusky"
-elif [ "${ROM_TARGET}" == "panther" ] || [ "${ROM_TARGET}" == "cheetah" ]; then
-  # pixel 7 / pixel 7 pro
-  ROM_TARGET_GROUP="pantah"
-elif [ "${ROM_TARGET}" == "felix" ] || [ "${ROM_TARGET}" == "comet" ]; then
-  # pixel fold / pixel 9 pro fold
-  ROM_TARGET_GROUP="${ROM_TARGET}"
-else
-  echo "Unsupported device codename"
-  exit 1
-fi
+AVBROOT_VERSION="3.9.0"
+export AVBROOT_VERSION
 
 ### CLEANUP PREVIOUS BUILDS
 rm -rf device_tmp/ kernel/ kernel_out/ rom/
@@ -116,7 +90,7 @@ popd
 ### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
 
 # fetch latest device sources temporarily
-git clone "https://github.com/GrapheneOS/device_google_${ROM_TARGET_GROUP}.git" device_tmp/
+git clone "https://github.com/GrapheneOS/device_google_comet.git" device_tmp/
 
 # determine tag
 pushd device_tmp
@@ -139,13 +113,8 @@ rm -rf device_tmp/
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  if [ "${ROM_TARGET}" == "comet" ]; then
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-zumapro.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
-  elif [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-shusky.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
-  else
-    repo init -u https://github.com/GrapheneOS/kernel_manifest-gs.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
-  fi
+  repo init -u https://github.com/GrapheneOS/kernel_manifest-zumapro.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
+  
   repo_sync_until_success
 
   # fetch & apply ksu and \susfs patches
@@ -154,31 +123,28 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # fetch susfs
-    git clone "https://gitlab.com/simonpunk/susfs4ksu.git" -b gki-android14-5.15
+    git clone "https://gitlab.com/cawilliamson/susfs4ksu.git" -b gki-android14-6.1
 
-    # apply susfs (to KernelSU)
+    # apply susfs to KernelSU
     pushd KernelSU/
       echo "Applying SUSFS for KernelSU..."
-      patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" # works! :)
+      patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
     popd
-
-    # determine target kernel version
-    if [ "${ROM_TARGET}" == "comet" ]; then
-      TARGET_KERNEL_VERSION="6.1"
-    elif [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-      TARGET_KERNEL_VERSION="5.15"
-    else
-      TARGET_KERNEL_VERSION="5.10"
-    fi
 
     # apply susfs to kernel
     echo "Applying SUSFS for kernel..."
-    patch -p1 < "susfs4ksu/kernel_patches/${TARGET_KERNEL_VERSION}/50_add_susfs_in_kernel.patch"
+    patch -p1 < "susfs4ksu/kernel_patches/50_add_susfs_in_kernel-6.1.patch"
 
     # copy susfs files to kernel (same for all kernels)
-    echo "Copying SUSFS files to kernel..."
-    cp -v "susfs4ksu/kernel_patches/SUSFS/fs/susfs.c" fs/
-    cp -v "susfs4ksu/kernel_patches/SUSFS/include/linux/susfs.h" include/linux/
+    echo "Copying susfs files to kernel..."
+    # KernelSU files
+    cp -v susfs4ksu/kernel_patches/KernelSU/kernel/sucompat.h KernelSU/kernel/
+    # FS files
+    cp -v susfs4ksu/kernel_patches/fs/susfs.c fs/
+    cp -v susfs4ksu/kernel_patches/fs/sus_su.c fs/
+    # Include files
+    cp -v susfs4ksu/kernel_patches/include/linux/susfs.h include/linux/
+    cp -v susfs4ksu/kernel_patches/include/linux/sus_su.h include/linux/
 
     # enable wireguard by default
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
@@ -186,24 +152,11 @@ pushd kernel/
   popd
 
   # build kernel
-  if [ "${ROM_TARGET_GROUP}" == "pantah" ]; then
-    # no idea why this is cloudripper.... D:
-    BUILD_AOSP_KERNEL=1 LTO=full ./build_cloudripper.sh
-  else
-    # pixel 8 should use:
-    #./build_shusky.sh --config=use_source_tree_aosp --config=no_download_gki --disable_32bit --lto=full
-    BUILD_AOSP_KERNEL=1 LTO=full ./build_${ROM_TARGET_GROUP}.sh
-  fi
+  ./build_comet.sh --config=use_source_tree_aosp --config=no_download_gki --lto=full
 popd
 
 # stash parts we need
-if [ "${ROM_TARGET}" == "comet" ]; then
-  mv -v "kernel/out/zumapro/dist" "./kernel_out"
-elif [ "${ROM_TARGET}" == "husky" ] || [ "${ROM_TARGET}" == "shiba" ]; then
-  mv -v "kernel/out/shusky/dist" "./kernel_out"
-else
-  mv -v "kernel/out/mixed/dist" "./kernel_out"
-fi
+mv -v "kernel/out/zumapro/dist" "./kernel_out"
 
 # remove kernel sources to save space before rom clone
 rm -rf kernel/
@@ -218,7 +171,7 @@ pushd rom/
   repo_sync_until_success
 
   # copy kernel sources
-  cp -Rfv ../kernel_out/* "device/google/${ROM_TARGET_GROUP}-kernel/"
+  cp -Rfv ../kernel_out/* "device/google/comet-kernel/"
   rm -rf ../kernel_out
 
   # fetch vendor binaries
@@ -235,17 +188,17 @@ pushd rom/
   m aapt2
 
   # fetch vendor binaries
-  ./vendor/adevtool/bin/run generate-all -d "${ROM_TARGET}"
+  ./vendor/adevtool/bin/run generate-all -d "comet"
 
   # start build
-  lunch "${ROM_TARGET}-${TARGET_RELEASE}-user"
+  lunch "comet-${TARGET_RELEASE}-user"
   # pixel 6:
   #m vendorbootimage target-files-package
   m vendorbootimage vendorkernelbootimage target-files-package
 
   # generate keys
-  mkdir -p "keys/${ROM_TARGET}/"
-  pushd "keys/${ROM_TARGET}/"
+  mkdir -p "keys/comet/"
+  pushd "keys/comet/"
     # generate and sign
     CN=GrapheneOS
     printf "\n" | ../../development/tools/make_key releasekey "/CN=$CN/" || true
@@ -261,7 +214,7 @@ pushd rom/
   popd
 
   # encrypt keys
-  expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh ./keys/${ROM_TARGET}
+  expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh ./keys/comet
 
   # generate ota package
   m otatools-package
@@ -270,9 +223,9 @@ pushd rom/
   expect ../expect/passphrase-prompts.exp script/finalize.sh
 
   # build release
-  expect ../expect/passphrase-prompts.exp script/generate-release.sh ${ROM_TARGET} ${BUILD_NUMBER}
+  expect ../expect/passphrase-prompts.exp script/generate-release.sh comet ${BUILD_NUMBER}
 popd
 
 # Write output
 echo "The file you are likely looking for is:"
-ls rom/releases/${BUILD_NUMBER}/release-${ROM_TARGET}-${BUILD_NUMBER}/${ROM_TARGET}-ota_update-${BUILD_NUMBER}.zip
+ls rom/releases/${BUILD_NUMBER}/release-comet-${BUILD_NUMBER}/comet-ota_update-${BUILD_NUMBER}.zip
