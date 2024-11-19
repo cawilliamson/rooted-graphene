@@ -7,10 +7,6 @@ set -e
 # NEVER remembers to sync again before running a build! :/
 git pull
 
-# set static variables
-AVBROOT_VERSION="3.9.0"
-export AVBROOT_VERSION
-
 ### CLEANUP PREVIOUS BUILDS
 rm -rf device_tmp/ kernel/ kernel_out/ rom/
 
@@ -78,14 +74,6 @@ popd
 git config --global color.ui false
 git config --global user.email "androidbuild@localhost"
 git config --global user.name "Android Build"
-
-# install avbroot
-pushd /var/tmp
-  curl -LSs "https://github.com/chenxiaolong/avbroot/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip" > avbroot.zip
-  unzip -o -p avbroot.zip avbroot > /usr/bin/avbroot
-  chmod +x /usr/bin/avbroot
-  rm -f avbroot.zip
-popd
 
 ### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
 
