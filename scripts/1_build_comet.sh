@@ -113,24 +113,18 @@ pushd kernel/
 
     # apply susfs to KernelSU
     pushd KernelSU/
-      echo "Applying SUSFS for KernelSU..."
+      echo "Applying susfs for KernelSU..."
       patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
     popd
 
     # apply susfs to kernel
-    echo "Applying SUSFS for kernel..."
+    echo "Applying susfs for kernel..."
     patch -p1 < "susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch"
 
     # copy susfs files to kernel (same for all kernels)
     echo "Copying susfs files to kernel..."
-    # KernelSU files
-    cp -v susfs4ksu/kernel_patches/KernelSU/kernel/sucompat.h KernelSU/kernel/
-    # FS files
-    cp -v susfs4ksu/kernel_patches/fs/susfs.c fs/
-    cp -v susfs4ksu/kernel_patches/fs/sus_su.c fs/
-    # Include files
-    cp -v susfs4ksu/kernel_patches/include/linux/susfs.h include/linux/
-    cp -v susfs4ksu/kernel_patches/include/linux/sus_su.h include/linux/
+    cp -v susfs4ksu/kernel_patches/fs/*.c fs/
+    cp -v susfs4ksu/kernel_patches/include/linux/*.h include/linux/
 
     # enable wireguard by default
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
