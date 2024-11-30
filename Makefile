@@ -1,22 +1,20 @@
 .PHONY: all build clean push
 
-# Default target
+# Default target must be first
 all:
-ifndef DEVICE
-	$(error DEVICE is not set. Usage: make all DEVICE=<device> OUTPUT=<output_path>)
-endif
-ifndef OUTPUT
-	$(error OUTPUT is not set. Usage: make all DEVICE=<device> OUTPUT=<output_path>)
-endif
+	$(call check_device)
+	$(call check_output)
 	$(MAKE) build
 	$(MAKE) push
 	$(MAKE) clean
 
+# Check required variables
+check_device = $(if $(DEVICE),,$(error DEVICE is required))
+check_output = $(if $(OUTPUT),,$(error OUTPUT is required))
+
 # Build sources using Docker
 build:
-ifndef DEVICE
-	$(error DEVICE is not set. Usage: make build DEVICE=<device>)
-endif
+	$(call check_device)
 	docker run --rm -it \
 		-v "$(PWD)":/src \
 		-w /src \
@@ -25,10 +23,9 @@ endif
 
 # Push OTA update
 push:
-ifndef OUTPUT
-	$(error OUTPUT is not set. Usage: make push OUTPUT=<output_path>)
-endif
-	./scripts/2_push_ota.sh $(OUTPUT)
+	$(call check_device)
+	$(call check_output)
+	./scripts/2_push_ota.sh $(DEVICE) $(OUTPUT)
 
 # Clean build directories
 clean:

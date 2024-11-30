@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 
-# grab output path
-OUTPUT="${1}"
+# grab input variables
+DEVICE="${1}"
+OUTPUT="${2}"
 
 # load in avbroot passwords
 # shellcheck disable=SC1091
 . "${HOME}/.avbroot/passwords.sh"
 
 # find latest ota zip
-OTA_ZIP_PATH=$(ls rom/out/release-*/*ota_update*.zip)
+OTA_ZIP_PATH=$(ls rom/releases/*/release-*/*ota_update*.zip)
 OTA_ZIP_NAME=$(basename "${OTA_ZIP_PATH}")
-
-# determine device name
-# shellcheck disable=SC2010
-DEVICE_CODENAME=$(ls rom/out | grep "release-" | cut -d '-' -f2)
 
 # sign ota zip with avbroot
 avbroot ota patch \
@@ -38,6 +35,6 @@ pushd "${OUTPUT}" || exit 1
 
   # create / update the custota json file
   custota-tool gen-update-info \
-    --file "${DEVICE_CODENAME}.json" \
+    --file "${DEVICE}.json" \
     --location "${OTA_ZIP_NAME}"
 popd || exit 1
