@@ -163,8 +163,8 @@ pushd rom/
   cp -Rfv ../kernel_out/* "device/google/${DEVICE}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/"
   rm -rf ../kernel_out
 
-  # fetch vendor binaries
-  ./vendor/adevtool/bin/run generate-all -d "${DEVICE}"
+  # install adevtool
+  yarnpkg install --cwd vendor/adevtool/
 
   # shellcheck source=/dev/null
   . build/envsetup.sh
@@ -176,6 +176,9 @@ pushd rom/
 
   # build aapt2
   m aapt2
+
+  # fetch vendor binaries
+  ./vendor/adevtool/bin/run generate-all -d "${DEVICE}"
 
   # start build
   lunch "${DEVICE}-${TARGET_RELEASE}-user"
