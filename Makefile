@@ -1,7 +1,16 @@
 .PHONY: all build clean push
 
 # Default target
-all: build push clean
+all:
+ifndef DEVICE
+	$(error DEVICE is not set. Usage: make all DEVICE=<device> OUTPUT=<output_path>)
+endif
+ifndef OUTPUT
+	$(error OUTPUT is not set. Usage: make all DEVICE=<device> OUTPUT=<output_path>)
+endif
+	$(MAKE) build
+	$(MAKE) push
+	$(MAKE) clean
 
 # Build sources using Docker
 build:
