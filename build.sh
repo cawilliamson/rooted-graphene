@@ -5,4 +5,4 @@ docker run --rm -it \
     -v "$(pwd)":/src \
     -w /src \
     ubuntu:latest \
-    /bin/bash -c "bash /src/scripts/1_build_comet.sh"
+    /bin/bash -c "bash /src/scripts/1_build_sources.sh"

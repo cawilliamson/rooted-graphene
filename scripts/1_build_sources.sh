@@ -2,6 +2,16 @@
 
 set -e
 
+# Check if device argument is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <device>"
+    exit 1
+fi
+
+# include device-specific variables
+DEVICE="$1"
+. "devices/${DEVICE}.sh"
+
 ### CLEANUP PREVIOUS BUILDS
 rm -rf \
   device_tmp/ \
@@ -77,7 +87,7 @@ git config --global user.name "Android Build"
 ### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
 
 # fetch latest device sources temporarily
-git clone "https://github.com/GrapheneOS/device_google_comet.git" device_tmp/
+git clone "${DEVICE_REPO}" device_tmp/
 
 # determine tag
 pushd device_tmp
@@ -100,7 +110,7 @@ rm -rf device_tmp/
 mkdir -p kernel/
 pushd kernel/
   # sync kernel sources
-  repo init -u https://github.com/GrapheneOS/kernel_manifest-zumapro.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
+  repo init -u "${KERNEL_REPO}" -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   repo_sync_until_success
 
   # fetch & apply ksu and \susfs patches
@@ -109,7 +119,7 @@ pushd kernel/
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
     # fetch susfs
-    git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b gki-android14-6.1
+    git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
 
     # apply susfs to KernelSU
     pushd KernelSU/
@@ -119,7 +129,7 @@ pushd kernel/
 
     # apply susfs to kernel
     echo "Applying susfs for kernel..."
-    patch -p1 < "susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch"
+    patch -p1 < "susfs4ksu/kernel_patches/${SUSFS_KERNEL_PATCH}"
 
     # copy susfs files to kernel (same for all kernels)
     echo "Copying susfs files to kernel..."
@@ -132,11 +142,11 @@ pushd kernel/
   popd
 
   # build kernel
-  ./build_comet.sh --config=use_source_tree_aosp --config=no_download_gki --lto=full
+  ${KERNEL_BUILD_COMMAND}
 popd
 
 # stash parts we need
-mv -v "kernel/out/comet/dist" "./kernel_out"
+mv -v "kernel/out/${DEVICE}/dist" "./kernel_out"
 
 # remove kernel sources to save space before rom clone
 rm -rf kernel/
@@ -151,12 +161,12 @@ pushd rom/
   repo_sync_until_success
 
   # copy kernel sources
-  KERNEL_DIR=$(ls device/google/comet-kernels/6.1 | grep -v '.git')
-  cp -Rfv ../kernel_out/* "device/google/comet-kernels/6.1/${KERNEL_DIR}/"
+  KERNEL_DIR=$(ls "device/google/${DEVICE}-kernels/${KERNEL_VERSION}" | grep -v '.git')
+  cp -Rfv ../kernel_out/* "device/google/${DEVICE}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/"
   rm -rf ../kernel_out
 
   # fetch vendor binaries
-  yarnpkg install --cwd vendor/adevtool/
+  ./vendor/adevtool/bin/run generate-all -d "${DEVICE}"
 
   # shellcheck source=/dev/null
   . build/envsetup.sh
@@ -168,16 +178,13 @@ pushd rom/
   # build aapt2
   m aapt2
 
-  # fetch vendor binaries
-  ./vendor/adevtool/bin/run generate-all -d "comet"
-
   # start build
-  lunch "comet-${TARGET_RELEASE}-user"
+  lunch "${DEVICE}-${TARGET_RELEASE}-user"
   m vendorbootimage vendorkernelbootimage target-files-package
 
   # generate keys
-  mkdir -p "keys/comet/"
-  pushd "keys/comet/"
+  mkdir -p "keys/${DEVICE}/"
+  pushd "keys/${DEVICE}/"
     # generate and sign
     CN=GrapheneOS
     printf "\n" | ../../development/tools/make_key releasekey "/CN=$CN/" || true
@@ -193,7 +200,7 @@ pushd rom/
   popd
 
   # encrypt keys
-  expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh ./keys/comet
+  expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh "./keys/${DEVICE}"
 
   # generate ota package
   m otatools-package
@@ -202,9 +209,9 @@ pushd rom/
   expect ../expect/passphrase-prompts.exp script/finalize.sh
 
   # build release
-  expect ../expect/passphrase-prompts.exp script/generate-release.sh comet ${BUILD_NUMBER}
+  expect ../expect/passphrase-prompts.exp script/generate-release.sh "${DEVICE}" ${BUILD_NUMBER}
 popd
 
 # Write output
 echo "The file you are likely looking for is:"
-ls rom/releases/${BUILD_NUMBER}/release-comet-${BUILD_NUMBER}/comet-ota_update-${BUILD_NUMBER}.zip
+ls "rom/releases/${BUILD_NUMBER}/release-${DEVICE}-${BUILD_NUMBER}/${DEVICE}-ota_update-${BUILD_NUMBER}.zip"
