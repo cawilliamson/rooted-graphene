@@ -7,3 +7,11 @@ KERNEL_VERSION="6.1"
 SUSFS_BRANCH="gki-android14-6.1"
 SUSFS_KERNEL_PATCH="50_add_susfs_in_gki-android14-6.1.patch"
 VERSION_CHECK_FILE="/var/www/html/custota.chrisaw.io/comet_latest.txt"
+
+export DEVICE_REPO \
+    KERNEL_BUILD_COMMAND \
+    KERNEL_REPO \
+    KERNEL_VERSION \
+    SUSFS_BRANCH \
+    SUSFS_KERNEL_PATCH \
+    VERSION_CHECK_FILE

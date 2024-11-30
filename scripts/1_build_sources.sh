@@ -4,6 +4,7 @@ set -e
 
 # include device-specific variables
 DEVICE="$1"
+# shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
 
 ### CLEANUP PREVIOUS BUILDS
@@ -164,6 +165,7 @@ pushd rom/
   repo_sync_until_success
 
   # copy kernel sources
+  # shellcheck disable=SC2010
   KERNEL_DIR=$(ls "device/google/${DEVICE}-kernels/${KERNEL_VERSION}" | grep -v '.git')
   cp -Rfv ../kernel_out/* "device/google/${DEVICE}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/"
   rm -rf ../kernel_out
@@ -175,6 +177,7 @@ pushd rom/
   . build/envsetup.sh
 
   # determine target release
+  # shellcheck disable=SC2038
   TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
   export TARGET_RELEASE
 
@@ -212,7 +215,7 @@ pushd rom/
   expect ../expect/passphrase-prompts.exp script/finalize.sh
 
   # build release
-  expect ../expect/passphrase-prompts.exp script/generate-release.sh "${DEVICE}" ${BUILD_NUMBER}
+  expect ../expect/passphrase-prompts.exp script/generate-release.sh "${DEVICE}" "${BUILD_NUMBER}"
 popd
 
 # Write output
