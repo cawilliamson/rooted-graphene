@@ -3,15 +3,11 @@
 # Default target
 all: build push clean
 
-# Check if device parameter is provided for build or all targets
-ifeq ($(filter build all,$(MAKECMDGOALS)),$(MAKECMDGOALS))
-ifndef DEVICE
-$(error DEVICE is not set. Usage: make DEVICE=<device>)
-endif
-endif
-
 # Build sources using Docker
 build:
+ifndef DEVICE
+	$(error DEVICE is not set. Usage: make build DEVICE=<device>)
+endif
 	docker run --rm -it \
 		-v "$(PWD)":/src \
 		-w /src \
@@ -20,7 +16,10 @@ build:
 
 # Push OTA update
 push:
-	./scripts/2_push_ota.sh
+ifndef OUTPUT
+	$(error OUTPUT is not set. Usage: make push OUTPUT=<output_path>)
+endif
+	./scripts/2_push_ota.sh $(OUTPUT)
 
 # Clean build directories
 clean:

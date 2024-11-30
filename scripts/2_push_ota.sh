@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
+# grab output path
+OUTPUT="${1}"
+
 # load in avbroot passwords
 # shellcheck disable=SC1091
 . "${HOME}/.avbroot/passwords.sh"
-
-CUSTOTA_WEB_DIR="/var/www/html/custota.chrisaw.io"
 
 # find latest ota zip
 OTA_ZIP_PATH=$(ls rom/out/release-*/*ota_update*.zip)
@@ -25,9 +26,9 @@ avbroot ota patch \
   --rootless # we already prepatched in kernelsu
 
 # move ota zip to web dir
-cp -v "${OTA_ZIP_PATH}.patched" "${CUSTOTA_WEB_DIR}/${OTA_ZIP_NAME}"
+cp -v "${OTA_ZIP_PATH}.patched" "${OUTPUT}/${OTA_ZIP_NAME}"
 
-pushd "${CUSTOTA_WEB_DIR}" || exit 1
+pushd "${OUTPUT}" || exit 1
   # generate csig for zip
   custota-tool gen-csig \
     --input "${OTA_ZIP_NAME}" \
