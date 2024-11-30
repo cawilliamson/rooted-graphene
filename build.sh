@@ -6,3 +6,6 @@ docker run --rm -it \
     -w /src \
     ubuntu:latest \
     /bin/bash -c "bash /src/scripts/1_build_sources.sh"
+
+# push update to web dir
+./scripts/2_push_ota.sh

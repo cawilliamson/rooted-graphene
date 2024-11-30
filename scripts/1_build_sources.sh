@@ -101,6 +101,15 @@ pushd device_tmp
   echo "Building GrapheneOS release: ${GRAPHENE_RELEASE}"
 popd
 
+# Check if version has already been built
+if [ -f "${VERSION_CHECK_FILE}" ]; then
+  PREVIOUS_VERSION=$(cat "${VERSION_CHECK_FILE}")
+  if [ "${PREVIOUS_VERSION}" = "${GRAPHENE_RELEASE}" ]; then
+    echo "Version ${GRAPHENE_RELEASE} has already been built. Skipping..."
+    exit 0
+  fi
+fi
+
 # cleanup device sources
 rm -rf device_tmp/
 
@@ -215,3 +224,6 @@ popd
 # Write output
 echo "The file you are likely looking for is:"
 ls "rom/releases/${BUILD_NUMBER}/release-${DEVICE}-${BUILD_NUMBER}/${DEVICE}-ota_update-${BUILD_NUMBER}.zip"
+
+# Update version check file
+echo "${GRAPHENE_RELEASE}" > "${VERSION_CHECK_FILE}"

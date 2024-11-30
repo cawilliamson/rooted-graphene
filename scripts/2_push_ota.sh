@@ -1,24 +1,9 @@
 #!/usr/bin/env bash
 
-# set static variables
-CUSTOTA_VERSION="4.5"
-export CUSTOTA_VERSION
-
 # load in avbroot passwords
 . $HOME/.avbroot/passwords.sh
 
-# install all apt dependencies
-apt update
-apt dist-upgrade -y
-apt install -y nginx
-
-# install custota
-pushd /var/tmp
-  curl -LSs "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_VERSION}/custota-tool-${CUSTOTA_VERSION}-x86_64-unknown-linux-gnu.zip" > custota-tool.zip
-  unzip -o -p custota-tool.zip custota-tool > /usr/bin/custota-tool
-  chmod +x /usr/bin/custota-tool
-  rm -f custota-tool.zip
-popd
+CUSTOTA_WEB_DIR="/var/www/html/custota.chrisaw.io"
 
 # find latest ota zip
 OTA_ZIP_PATH=$(ls rom/out/release-*/*ota_update*.zip)
@@ -38,9 +23,9 @@ avbroot ota patch \
   --rootless # we already prepatched in kernelsu
 
 # move ota zip to web dir
-cp -v $OTA_ZIP_PATH.patched /var/www/html/$OTA_ZIP_NAME
+cp -v $OTA_ZIP_PATH.patched "${CUSTOTA_WEB_DIR}/${OTA_ZIP_NAME}"
 
-pushd /var/www/html
+pushd "${CUSTOTA_WEB_DIR}"
   # generate csig for zip
   custota-tool gen-csig \
     --input $OTA_ZIP_NAME \
