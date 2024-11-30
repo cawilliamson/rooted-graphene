@@ -7,13 +7,6 @@ DEVICE="$1"
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
 
-### CLEANUP PREVIOUS BUILDS
-rm -rf \
-  device_tmp/ \
-  kernel/ \
-  kernel_out/ \
-  rom/
-
 ### FUNCTIONS
 
 # Function to run repo sync until successful

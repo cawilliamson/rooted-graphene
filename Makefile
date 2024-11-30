@@ -1,7 +1,7 @@
-.PHONY: all build push
+.PHONY: all build clean push
 
 # Default target
-all: build push
+all: build push clean
 
 # Check if device parameter is provided
 ifndef DEVICE
@@ -19,3 +19,7 @@ build:
 # Push OTA update
 push: build
 	./scripts/2_push_ota.sh
+
+# Clean build directories
+clean:
+	rm -rfv device_tmp/ kernel/ kernel_out/ rom/
