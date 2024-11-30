@@ -2,12 +2,6 @@
 
 set -e
 
-# Check if device argument is provided
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <device>"
-    exit 1
-fi
-
 # include device-specific variables
 DEVICE="$1"
 . "devices/${DEVICE}.sh"
@@ -106,7 +100,7 @@ if [ -f "${VERSION_CHECK_FILE}" ]; then
   PREVIOUS_VERSION=$(cat "${VERSION_CHECK_FILE}")
   if [ "${PREVIOUS_VERSION}" = "${GRAPHENE_RELEASE}" ]; then
     echo "Version ${GRAPHENE_RELEASE} has already been built. Skipping..."
-    exit 0
+    exit 1
   fi
 fi
 
