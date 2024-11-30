@@ -3,9 +3,11 @@
 # Default target
 all: build push clean
 
-# Check if device parameter is provided
+# Check if device parameter is provided (only for build-related targets)
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
 ifndef DEVICE
 $(error DEVICE is not set. Usage: make DEVICE=<device>)
+endif
 endif
 
 # Build sources using Docker
@@ -13,7 +15,7 @@ build:
 	docker run --rm -it \
 		-v "$(PWD)":/src \
 		-w /src \
-		ubuntu:latest \
+			ubuntu:latest \
 		/bin/bash -c "bash /src/scripts/1_build_sources.sh $(DEVICE)"
 
 # Push OTA update
