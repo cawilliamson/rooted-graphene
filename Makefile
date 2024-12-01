@@ -18,8 +18,8 @@ build:
 	docker run --rm -it \
 		-v "$(PWD)":/src \
 		-w /src \
-			ubuntu:latest \
-		/bin/bash -c "bash /src/scripts/1_build_sources.sh $(DEVICE)"
+		ubuntu:latest \
+		/bin/bash /src/scripts/1_build_sources.sh $(DEVICE)
 
 # Push OTA update
 push:
