@@ -15,7 +15,7 @@ check_output = $(if $(OUTPUT),,$(error OUTPUT is required))
 # Build sources using Docker
 build:
 	$(call check_device)
-	docker run --rm -it \
+	docker run --rm \
 		-v "$(PWD)":/src \
 		-w /src \
 		ubuntu:latest \
