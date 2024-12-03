@@ -89,6 +89,9 @@ pushd device_tmp
   echo "Building GrapheneOS release: ${GRAPHENE_RELEASE}"
 popd
 
+# cleanup device sources
+rm -rf device_tmp/
+
 # Check if version has already been built
 if [ -f "${DEVICE}_latest.txt" ]; then
   PREVIOUS_VERSION=$(cat "${DEVICE}_latest.txt")
@@ -97,9 +100,6 @@ if [ -f "${DEVICE}_latest.txt" ]; then
     exit 1
   fi
 fi
-
-# cleanup device sources
-rm -rf device_tmp/
 
 ### BUILD KERNEL
 
