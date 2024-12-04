@@ -1,5 +1,8 @@
 .PHONY: all build clean push-ota
 
+CPU_LIMIT := $(shell echo $$(( $(shell nproc --all) / 2 )))
+MEM_LIMIT := $(shell echo "$$(( $(shell free -m | awk '/^Mem:/{print $$2}') / 2 ))m")
+
 # Default target must be first
 all:
 	$(call check_device)
@@ -17,8 +20,6 @@ check_output = $(if $(OUTPUT),,$(error OUTPUT is required))
 # Build sources using Docker
 build:
 	$(call check_device)
-	CPU_LIMIT := $(shell echo $$(( $(shell nproc --all) / 2 )))
-	MEM_LIMIT := $(shell echo "$$(( $(shell free -m | awk '/^Mem:/{print $$2}') / 2 ))m")
 	docker run --rm \
 		--cpus="$CPU_LIMIT" \
 		--memory="$MEM_LIMIT" \
