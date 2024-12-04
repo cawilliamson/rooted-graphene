@@ -1,11 +1,13 @@
-.PHONY: all build clean push
+.PHONY: all build clean push-ota
 
 # Default target must be first
 all:
 	$(call check_device)
 	$(call check_output)
+	$(MAKE) clean
+	$(MAKE) pull-repo
 	$(MAKE) build
-	$(MAKE) push
+	$(MAKE) push-ota
 	$(MAKE) clean
 
 # Check required variables
@@ -25,8 +27,13 @@ build:
 		ubuntu:latest \
 		/bin/bash /src/scripts/1_build_sources.sh $(DEVICE)
 
+# Pull repo updates
+pull-repo:
+	git reset --hard
+	git pull
+
 # Push OTA update
-push:
+push-ota:
 	$(call check_device)
 	$(call check_output)
 	./scripts/2_push_ota.sh $(DEVICE) $(OUTPUT)
