@@ -1,7 +1,11 @@
 .PHONY: all build clean push-ota
 
-CPU_LIMIT := $(shell echo $$(( $(shell nproc --all) / 2 )))
-MEM_LIMIT := $(shell echo "$$(( $(shell free -m | awk '/^Mem:/{print $$2}') / 2 ))m")
+# optional inputs for CPU and memory limits (defaults to 100% of available resources)
+MAX_CPU_PERCENT ?= 100
+MAX_MEM_PERCENT ?= 100
+
+CPU_LIMIT := $(shell echo $$(( $(shell nproc --all) * $(MAX_CPU_PERCENT	 / 100 )))
+MEM_LIMIT := $(shell echo "$$(( $(shell free -m | awk '/^Mem:/{print $$2}') * $(MAX_MEM_PERCENT) / 100 ))m")
 
 # Default target must be first
 all:
