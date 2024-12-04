@@ -21,8 +21,8 @@ check_output = $(if $(OUTPUT),,$(error OUTPUT is required))
 build:
 	$(call check_device)
 	docker run --rm \
-		--cpus="$CPU_LIMIT" \
-		--memory="$MEM_LIMIT" \
+		--cpus="$(CPU_LIMIT)" \
+		--memory="$(MEM_LIMIT)" \
 		-v "$(PWD)":/src \
 		-w /src \
 		ubuntu:latest \
