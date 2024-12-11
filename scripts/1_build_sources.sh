@@ -169,14 +169,6 @@ pushd rom/
   # shellcheck source=/dev/null
   . build/envsetup.sh
 
-  # not sure why we have to build this (?)
-  lunch sdk_phone64_x86_64-cur-user
-
-  # determine target release
-  # shellcheck disable=SC2038
-  TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
-  export TARGET_RELEASE
-
   # build aapt2
   m aapt2
 
@@ -184,7 +176,7 @@ pushd rom/
   ./vendor/adevtool/bin/run generate-all -d "${DEVICE}"
 
   # start build
-  lunch "${DEVICE}-${TARGET_RELEASE}-user"
+  lunch "${DEVICE}-cur-user"
   ${ROM_BUILD_COMMAND}
 
   # generate keys
