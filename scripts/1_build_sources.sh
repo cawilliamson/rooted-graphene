@@ -169,6 +169,9 @@ pushd rom/
   # shellcheck source=/dev/null
   . build/envsetup.sh
 
+  # not sure why we have to build this (?)
+  lunch sdk_phone64_x86_64-cur-user
+
   # determine target release
   # shellcheck disable=SC2038
   TARGET_RELEASE=$(find build/release/aconfig/* -type d ! -name 'root' -print -quit | xargs basename)
@@ -182,7 +185,7 @@ pushd rom/
 
   # start build
   lunch "${DEVICE}-${TARGET_RELEASE}-user"
-  m vendorbootimage vendorkernelbootimage target-files-package
+  ${ROM_BUILD_COMMAND}
 
   # generate keys
   mkdir -p "keys/${DEVICE}/"
