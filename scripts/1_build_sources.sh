@@ -175,8 +175,13 @@ pushd rom/
   # fetch vendor binaries
   ./vendor/adevtool/bin/run generate-all -d "${DEVICE}"
 
+  # determine target release
+  # shellcheck disable=SC2012,SC2038
+  TARGET_RELEASE=$(ls build/release/aconfig | sort | grep -v root | grep -v trunk_staging | tail -n1)
+  export TARGET_RELEASE
+
   # start build
-  lunch "${DEVICE}-cur-user"
+  lunch "${DEVICE}-${TARGET_RELEASE}-user"
   ${ROM_BUILD_COMMAND}
 
   # generate keys
