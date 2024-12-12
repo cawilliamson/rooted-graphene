@@ -170,6 +170,7 @@ pushd rom/
   . build/envsetup.sh
 
   # build aapt2
+  lunch sdk_phone64_x86_64-cur-user
   m aapt2
 
   # fetch vendor binaries
