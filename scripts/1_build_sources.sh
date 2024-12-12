@@ -139,7 +139,7 @@ pushd kernel/
   popd
 
   # build kernel
-  "${KERNEL_BUILD_COMMAND}"
+  ${KERNEL_BUILD_COMMAND}
 popd
 
 # stash parts we need
@@ -185,7 +185,7 @@ pushd rom/
 
   # start build
   lunch "${DEVICE}-${TARGET_RELEASE}-user"
-  "${ROM_BUILD_COMMAND}"
+  ${ROM_BUILD_COMMAND}
 
   # generate keys
   mkdir -p "keys/${DEVICE}/"
