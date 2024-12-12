@@ -139,7 +139,7 @@ pushd kernel/
   popd
 
   # build kernel
-  ${KERNEL_BUILD_COMMAND}
+  "${KERNEL_BUILD_COMMAND}"
 popd
 
 # stash parts we need
@@ -180,9 +180,12 @@ pushd rom/
   TARGET_RELEASE=$(ls build/release/aconfig | sort | grep -v root | grep -v trunk_staging | tail -n1)
   export TARGET_RELEASE
 
+  # replace configured kernel path with newer "grapheneos" version agnostic path
+  sed -i 's#\(device/google/'"${DEVICE}"'-kernels/'"${KERNEL_VERSION}"'/\)[^"]*#\1grapheneos#' "build/release/flag_values/${TARGET_RELEASE}/RELEASE_KERNEL_${DEVICE^^}_DIR.textproto"
+
   # start build
   lunch "${DEVICE}-${TARGET_RELEASE}-user"
-  ${ROM_BUILD_COMMAND}
+  "${ROM_BUILD_COMMAND}"
 
   # generate keys
   mkdir -p "keys/${DEVICE}/"
