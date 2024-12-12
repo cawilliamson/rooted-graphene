@@ -167,7 +167,7 @@ pushd rom/
   yarnpkg install --cwd vendor/adevtool/
 
   # shellcheck source=/dev/null
-  . build/envsetup.sh
+  source build/envsetup.sh
 
   # build aapt2
   lunch sdk_phone64_x86_64-cur-user
@@ -176,16 +176,10 @@ pushd rom/
   # fetch vendor binaries
   ./vendor/adevtool/bin/run generate-all -d "${DEVICE}"
 
-  # determine target release
-  # shellcheck disable=SC2012,SC2038
-  TARGET_RELEASE=$(ls build/release/aconfig | sort | grep -v root | grep -v trunk_staging | tail -n1)
-  export TARGET_RELEASE
-
-  # replace configured kernel path with newer "grapheneos" version agnostic path
-  sed -i 's#\(device/google/'"${DEVICE}"'-kernels/'"${KERNEL_VERSION}"'/\)[^"]*#\1grapheneos#' "build/release/flag_values/${TARGET_RELEASE}/RELEASE_KERNEL_${DEVICE^^}_DIR.textproto"
-
   # start build
-  lunch "${DEVICE}-${TARGET_RELEASE}-user"
+  # shellcheck source=/dev/null
+  source build/envsetup.sh
+  lunch "${DEVICE}-cur-user"
   ${ROM_BUILD_COMMAND}
 
   # generate keys
