@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-AVBROOT_VERSION="1.0.0"
-CUSTOTA_VERSION="5.4"
-export AVBROOT_VERSION CUSTOTA_VERSION
+AVBROOT_VERSION="3.10.0"
+CUSTOTA_TOOL_VERSION="5.4"
+export AVBROOT_VERSION CUSTOTA_TOOL_VERSION
 
 # install all apt dependencies
 apt update
@@ -12,13 +12,13 @@ apt install -y \
   unzip
 
 # install avbroot
-curl -s -O /var/tmp/avbroot.zip "https://github.com/chenxiaolong/Custota/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip" && \
+curl -s -O /var/tmp/avbroot.zip "https://github.com/chenxiaolong/avbroot/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip"
 unzip /var/tmp/avbroot.zip -d /usr/bin
 chmod +x /usr/bin/avbroot
 rm -f /var/tmp/avbroot.zip
 
 # install custota-tool
-curl -s -O /var/tmp/custota-tool.zip "https://github.com/custota/custota/releases/download/${CUSTOTA_VERSION}/custota-${CUSTOTA_VERSION}-x86_64-unknown-linux-gnu.zip"
+curl -s -O /var/tmp/custota-tool.zip "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_TOOL_VERSION}/custota-${CUSTOTA_TOOL_VERSION}-x86_64-unknown-linux-gnu.zip"
 unzip /var/tmp/custota-tool.zip -d /usr/bin
 chmod +x /usr/bin/custota-tool
 rm -f /var/tmp/custota-tool.zip
