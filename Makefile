@@ -3,6 +3,7 @@
 # optional inputs for CPU and memory limits (defaults to 100% of available resources)
 MAX_CPU_PERCENT ?= 100
 MAX_MEM_PERCENT ?= 100
+GRAPHENE_BRANCH ?= stable
 
 CPU_LIMIT := $(shell echo $$(( $(shell nproc --all) * $(MAX_CPU_PERCENT) / 100 )))
 MEM_LIMIT := $(shell echo "$$(( $(shell free -m | awk '/^Mem:/{print $$2}') * $(MAX_MEM_PERCENT) / 100 ))m")
@@ -30,7 +31,7 @@ build:
 		-v "$(PWD)":/src \
 		-w /src \
 		ubuntu:latest \
-		/bin/bash /src/scripts/1_build_sources.sh $(DEVICE)
+		/bin/bash /src/scripts/1_build_sources.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Pull repo updates
 pull-repo:

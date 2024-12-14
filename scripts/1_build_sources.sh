@@ -3,7 +3,9 @@
 set -e
 
 # include device-specific variables
-DEVICE="$1"
+DEVICE="${1,,}"
+GRAPHENE_BRANCH="${2,,}"
+
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
 
@@ -48,6 +50,7 @@ apt install -y \
   python3 \
   python3-googleapi \
   python3-protobuf \
+  pup \
   rsync \
   ssh \
   unzip \
@@ -74,23 +77,8 @@ git config --global user.name "Android Build"
 
 ### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
 
-# fetch latest device sources temporarily
-git clone "${DEVICE_REPO}" device_tmp/
-
 # determine tag
-pushd device_tmp
-  GRAPHENE_RELEASE=$(git describe --tags --abbrev=0)
-
-  # remove any extension (like "-redfin" for example)
-  GRAPHENE_RELEASE="${GRAPHENE_RELEASE%%-*}"
-  export GRAPHENE_RELEASE
-
-  # write out status
-  echo "Building GrapheneOS release: ${GRAPHENE_RELEASE}"
-popd
-
-# cleanup device sources
-rm -rf device_tmp/
+GRAPHENE_RELEASE=$(curl -s https://grapheneos.org/releases | pup "tr#${DEVICE}-${GRAPHENE_BRANCH} td:nth-of-type(2) text{}")
 
 # Check if version has already been built
 if [ -f "${DEVICE}_latest.txt" ]; then
