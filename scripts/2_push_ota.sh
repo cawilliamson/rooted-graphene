@@ -12,13 +12,13 @@ apt install -y \
   unzip
 
 # install avbroot
-curl -s -O /var/tmp/avbroot.zip "https://github.com/chenxiaolong/avbroot/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip"
+curl -o /var/tmp/avbroot.zip -L "https://github.com/chenxiaolong/avbroot/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip"
 unzip /var/tmp/avbroot.zip -d /usr/bin
 chmod +x /usr/bin/avbroot
 rm -f /var/tmp/avbroot.zip
 
 # install custota-tool
-curl -s -O /var/tmp/custota-tool.zip "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_TOOL_VERSION}/custota-${CUSTOTA_TOOL_VERSION}-x86_64-unknown-linux-gnu.zip"
+curl -o /var/tmp/custota-tool.zip -L "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_TOOL_VERSION}/custota-tool-${CUSTOTA_TOOL_VERSION}-x86_64-unknown-linux-gnu.zip"
 unzip /var/tmp/custota-tool.zip -d /usr/bin
 chmod +x /usr/bin/custota-tool
 rm -f /var/tmp/custota-tool.zip
