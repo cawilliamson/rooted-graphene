@@ -2,6 +2,10 @@
 
 set -e
 
+# set variables
+PUP_VERSION="0.4.0"
+export PUP_VERSION
+
 # include device-specific variables
 DEVICE="${1,,}"
 GRAPHENE_BRANCH="${2,,}"
@@ -50,12 +54,17 @@ apt install -y \
   python3 \
   python3-googleapi \
   python3-protobuf \
-  pup \
   rsync \
   ssh \
   unzip \
   yarnpkg \
   zip
+
+# install pup command
+curl -o /var/tmp/pup.zip -L "https://github.com/ericchiang/pup/releases/download/v${PUP_VERSION}/pup_v${PUP_VERSION}_linux_amd64.zip"
+unzip /var/tmp/pup.zip -d /usr/bin
+chmod +x /usr/bin/pup
+rm -f /var/tmp/pup.zip
 
 # install repo command
 curl -s https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
@@ -98,10 +107,18 @@ pushd kernel/
   repo init -u "${KERNEL_REPO}" -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   repo_sync_until_success
 
+  # remove abi_gki_protected_exports files
+  rm -f "common/android/abi_gki_protected_exports_*"
+
   # fetch & apply ksu and \susfs patches
   pushd aosp/
     # apply kernelsu
-    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
+
+    # patch kernelsu versioning
+    pushd KernelSU/
+      patch -p1 < "../../../patches/0003-Fix-kernelsu-versioning.patch"
+    popd
 
     # fetch susfs
     git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
