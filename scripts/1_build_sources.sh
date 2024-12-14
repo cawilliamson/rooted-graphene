@@ -115,18 +115,16 @@ pushd kernel/
     # apply kernelsu
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
 
-    # patch kernelsu versioning
-    pushd KernelSU/
-      patch -p1 < "../../../patches/0003-Fix-kernelsu-versioning.patch"
-    popd
-
     # fetch susfs
     git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
 
-    # apply susfs to KernelSU
+    # apply KernelSU patches
     pushd KernelSU/
       echo "Applying susfs for KernelSU..."
       patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+
+      echo "Patching KernelSU versioning..."
+      patch -p1 < "../../../patches/0003-Fix-kernelsu-versioning.patch"
     popd
 
     # apply susfs to kernel
