@@ -13,7 +13,7 @@ apt install -y \
 
 # install avbroot
 curl -o /var/tmp/avbroot.zip -L "https://github.com/chenxiaolong/avbroot/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip"
-unzip /var/tmp/avbroot.zip -d /usr/bin
+unzip /var/tmp/avbroot.zip -d /usr/bin -x LICENSE README.md
 chmod +x /usr/bin/avbroot
 rm -f /var/tmp/avbroot.zip
 
