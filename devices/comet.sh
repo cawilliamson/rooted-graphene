@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 DEVICE_REPO="https://github.com/GrapheneOS/device_google_comet.git"
-KERNEL_BUILD_COMMAND="./build_comet.sh --config=no_download_gki --config=no_download_gki_fips140 --lto=full"
+KERNEL_BUILD_COMMAND="\
+    pushd aosp/ && tools/bazel run --config=fast //common:kernel_aarch64_dist -- --dist_dir=dist && popd && \
+    ./build_comet.sh --config=no_download_gki --config=no_download_gki_fips140 --lto=full"
 KERNEL_REPO="https://github.com/GrapheneOS/kernel_manifest-zumapro.git"
 KERNEL_VERSION="6.1"
 ROM_BUILD_COMMAND="m vendorbootimage vendorkernelbootimage target-files-package"
