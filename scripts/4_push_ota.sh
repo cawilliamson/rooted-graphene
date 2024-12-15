@@ -6,8 +6,6 @@
 
 # grab input variables
 DEVICE="${1}"
-KEYS_DIR="${2}"
-WEB_DIR="${3}"
 
 # load in avbroot passwords
 # shellcheck disable=SC1091
@@ -20,23 +18,23 @@ OTA_ZIP_NAME=$(basename "${OTA_ZIP_PATH}")
 # sign ota zip with avbroot
 avbroot ota patch \
   --input "${OTA_ZIP_PATH}" \
-  --key-avb "${KEYS_DIR}/avb.key" \
+  --key-avb "/keys/avb.key" \
   --pass-avb-env-var AVB_PASSWORD \
-  --key-ota "${KEYS_DIR}/ota.key" \
+  --key-ota "/keys/ota.key" \
   --pass-ota-env-var OTA_PASSWORD \
-  --cert-ota "${KEYS_DIR}/ota.crt" \
+  --cert-ota "/keys/ota.crt" \
   --rootless # we already prepatched in kernelsu
 
 # move ota zip to web dir
-cp -v "${OTA_ZIP_PATH}.patched" "${WEB_DIR}/${OTA_ZIP_NAME}"
+cp -v "${OTA_ZIP_PATH}.patched" "/web/${OTA_ZIP_NAME}"
 
-pushd "${WEB_DIR}" || exit
+pushd "/web" || exit
   # generate csig for zip
   custota-tool gen-csig \
     --input "${OTA_ZIP_NAME}" \
-    --key "${KEYS_DIR}/ota.key" \
+    --key "/keys/ota.key" \
     --passphrase-env-var OTA_PASSWORD \
-    --cert "${KEYS_DIR}/ota.crt"
+    --cert "/keys/ota.crt"
 
   # create / update the custota json file
   custota-tool gen-update-info \

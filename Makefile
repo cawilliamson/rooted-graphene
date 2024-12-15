@@ -72,9 +72,11 @@ push-ota:
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
 		-v "$(PWD)":/src \
+		-v "$(KEYS_DIR)":/keys \
+		-v "$(WEB_DIR)":/web \
 		-w /src \
 		buildrom \
-		/bin/bash /src/scripts/4_push_ota.sh $(DEVICE) $(KEYS_DIR) $(WEB_DIR)
+		/bin/bash /src/scripts/4_push_ota.sh $(DEVICE)
 
 # Clean build directories
 clean:
