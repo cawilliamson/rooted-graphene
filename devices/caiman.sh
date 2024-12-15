@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 DEVICE_REPO="https://github.com/GrapheneOS/device_google_zumapro.git"
-KERNEL_BUILD_COMMAND="pushd aosp/; tools/bazel run --config=fast //common:kernel_aarch64_dist -- --dist_dir=dist; popd; ./build_caimito.sh --config=no_download_gki --config=no_download_gki_fips140 --lto=full"
+KERNEL_BUILD_COMMAND="./build_caimito.sh --config=no_download_gki --config=no_download_gki_fips140 --lto=full"
+KERNEL_KSU_EXTRA_COMMANDS="tools/bazel run --config=fast //common:kernel_aarch64_dist -- --dist_dir=dist"
 KERNEL_REPO="https://github.com/GrapheneOS/kernel_manifest-zumapro.git"
 KERNEL_VERSION="6.1"
 ROM_BUILD_COMMAND="m vendorbootimage vendorkernelbootimage target-files-package"
@@ -10,6 +11,7 @@ SUSFS_KERNEL_PATCH="50_add_susfs_in_gki-android14-6.1.patch"
 
 export DEVICE_REPO \
     KERNEL_BUILD_COMMAND \
+    KERNEL_KSU_EXTRA_COMMANDS \
     KERNEL_REPO \
     KERNEL_VERSION \
     ROM_BUILD_COMMAND \
