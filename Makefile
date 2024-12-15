@@ -14,16 +14,20 @@ all:
 	$(call check_device)
 	$(call check_web_dir)
 	$(MAKE) clean
+	$(MAKE) build-docker-image
 	$(MAKE) check-versions
 	$(MAKE) pull-repo
 	$(MAKE) build-kernel
 	$(MAKE) build-rom
 	$(MAKE) push-ota
-	$(MAKE) clean
 
 # Check required variables
 check_device = $(if $(DEVICE),,$(error DEVICE is required))
 check_web_dir = $(if $(WEB_DIR),,$(error WEB_DIR is required))
+
+# Build docker image
+build-docker-image:
+	docker build -t buildrom .
 
 # Build kernel using Docker
 build-kernel:
@@ -33,7 +37,7 @@ build-kernel:
 		--memory="$(MEM_LIMIT)" \
 		-v "$(PWD)":/src \
 		-w /src \
-		ubuntu:latest \
+		buildrom \
 		/bin/bash /src/scripts/2_build_kernel.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Build rom using Docker
@@ -44,7 +48,7 @@ build-rom:
 		--memory="$(MEM_LIMIT)" \
 		-v "$(PWD)":/src \
 		-w /src \
-		ubuntu:latest \
+		buildrom \
 		/bin/bash /src/scripts/3_build_rom.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Check versions
@@ -52,7 +56,7 @@ check-versions:
 	docker run --rm \
 		-v "$(PWD)":/src \
 		-w /src \
-		ubuntu:latest \
+		buildrom \
 		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Pull repo updates
@@ -69,8 +73,8 @@ push-ota:
 		--memory="$(MEM_LIMIT)" \
 		-v "$(PWD)":/src \
 		-w /src \
-		ubuntu:latest \
-		/bin/bash /src/scripts/2_push_ota.sh $(DEVICE) $(KEYS_DIR) $(WEB_DIR)
+		buildrom \
+		/bin/bash /src/scripts/4_push_ota.sh $(DEVICE) $(KEYS_DIR) $(WEB_DIR)
 
 # Clean build directories
 clean:

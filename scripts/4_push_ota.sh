@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# execute setup container script
+# include common functions
 # shellcheck disable=SC1091
-. "scripts/0_setup_container.sh"
+. "scripts/0_includes.sh"
 
 # grab input variables
 DEVICE="${1}"
