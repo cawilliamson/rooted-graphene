@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 # execute setup container script
-. scripts/0_setup_container.sh
+# shellcheck disable=SC1091
+. "scripts/0_setup_container.sh"
 
 # include device-specific variables
 DEVICE="${1,,}"
+GRAPHENE_RELEASE="$(cat "${DEVICE}_building.txt")"
 
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
@@ -13,7 +15,7 @@ DEVICE="${1,,}"
 
 # fetch rom sources
 mkdir -p rom/
-pushd rom/
+pushd rom/ || exit
   # sync rom sources
   repo init -u https://github.com/GrapheneOS/platform_manifest.git -b "refs/tags/${GRAPHENE_RELEASE}" --depth=1 --git-lfs
   repo_sync_until_success
@@ -45,7 +47,7 @@ pushd rom/
 
   # generate keys
   mkdir -p "keys/${DEVICE}/"
-  pushd "keys/${DEVICE}/"
+  pushd "keys/${DEVICE}/" || exit
     # generate and sign
     CN=GrapheneOS
     printf "\n" | ../../development/tools/make_key releasekey "/CN=$CN/" || true
@@ -58,7 +60,7 @@ pushd rom/
     openssl genrsa 4096 | openssl pkcs8 -topk8 -scrypt -out avb.pem -passout pass:""
     expect ../../../expect/passphrase-prompts.exp ../../external/avb/avbtool.py extract_public_key --key avb.pem --output avb_pkmd.bin
     ssh-keygen -t ed25519 -f id_ed25519 -N ""
-  popd # keys/${DEVICE}/
+  popd || exit # keys/${DEVICE}/
 
   # encrypt keys
   expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh "./keys/${DEVICE}"
@@ -71,7 +73,7 @@ pushd rom/
 
   # build release
   expect ../expect/passphrase-prompts.exp script/generate-release.sh "${DEVICE}" "${BUILD_NUMBER}"
-popd # rom/
+popd || exit # rom/
 
 # Write output
 echo "The file you are likely looking for is:"

@@ -74,4 +74,4 @@ push-ota:
 
 # Clean build directories
 clean:
-	rm -rfv device_tmp/ kernel/ kernel_out/ rom/
+	rm -rfv "*_building.txt" device_tmp/ kernel/ kernel_out/ rom/
