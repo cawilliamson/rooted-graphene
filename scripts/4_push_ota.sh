@@ -9,7 +9,7 @@ DEVICE="${1}"
 
 # load in avbroot passwords
 # shellcheck disable=SC1091
-. "${KEYS_DIR}/passwords.sh"
+. "/keys/passwords.sh"
 
 # find latest ota zip
 OTA_ZIP_PATH=$(ls rom/releases/*/release-*/*ota_update*.zip)
