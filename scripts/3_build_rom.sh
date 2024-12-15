@@ -22,8 +22,8 @@ pushd rom/ || exit
 
   # copy kernel sources
   # shellcheck disable=SC2010
-  KERNEL_DIR=$(ls "device/google/${DEVICE}-kernels/${KERNEL_VERSION}" | grep -v '.git')
-  cp -Rfv ../kernel_out/* "device/google/${DEVICE}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/"
+  KERNEL_DIR=$(ls "device/google/${DEVICE_GROUP}-kernels/${KERNEL_VERSION}" | grep -v '.git')
+  cp -Rfv ../kernel_out/* "device/google/${DEVICE_GROUP}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/"
   rm -rf ../kernel_out
 
   # install adevtool

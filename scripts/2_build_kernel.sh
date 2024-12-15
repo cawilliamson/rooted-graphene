@@ -66,7 +66,7 @@ pushd kernel/ || exit
 popd || exit
 
 # stash parts we need
-mv -v "kernel/out/${DEVICE}/dist" "./kernel_out"
+mv -v "kernel/out/${DEVICE_GROUP}/dist" "./kernel_out"
 
 # remove kernel sources to save space before rom clone
 rm -rf kernel/
