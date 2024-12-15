@@ -80,4 +80,4 @@ echo "The file you are likely looking for is:"
 ls "rom/releases/${BUILD_NUMBER}/release-${DEVICE}-${BUILD_NUMBER}/${DEVICE}-ota_update-${BUILD_NUMBER}.zip"
 
 # Update version check file
-echo "${GRAPHENE_RELEASE}" > "${DEVICE}_latest.txt"
+echo "${GRAPHENE_RELEASE}" > "${DEVICE}_built.txt"
