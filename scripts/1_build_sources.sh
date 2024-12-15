@@ -136,11 +136,15 @@ pushd kernel/
     # enable wireguard by default
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
     patch -p1 < "../../patches/0002-Enable-wireguard-by-default.patch"
+  popd
 
-    # run extra kernelsu command (if defined)
-    if [ -n "${KERNEL_KSU_EXTRA_COMMANDS}" ]; then
-      ${KERNEL_KSU_EXTRA_COMMANDS}
-    fi
+  # hardcode kernelsu version (workaround a bug where it defaults to v16 and breaks manager app)
+  pushd KernelSU/
+    # determine kernelsu version
+    KSU_VERSION=$(($(git rev-list --count HEAD) + 10200))
+
+    # hardcode kernelsu version
+    sed -i '1s/^/ccflags-y += -DKSU_VERSION='"${KSU_VERSION}"'\n/' kernel/Makefile
   popd
 
   # build kernel
