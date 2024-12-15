@@ -30,7 +30,7 @@ avbroot ota patch \
 # move ota zip to web dir
 cp -v "${OTA_ZIP_PATH}.patched" "${WEB_DIR}/${OTA_ZIP_NAME}"
 
-pushd "${WEB_DIR}" || exit 1
+pushd "${WEB_DIR}" || exit
   # generate csig for zip
   custota-tool gen-csig \
     --input "${OTA_ZIP_NAME}" \
@@ -42,4 +42,4 @@ pushd "${WEB_DIR}" || exit 1
   custota-tool gen-update-info \
     --file "${DEVICE}.json" \
     --location "${OTA_ZIP_NAME}"
-popd || exit 1
+popd || exit
