@@ -136,16 +136,16 @@ pushd kernel/
     # enable wireguard by default
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
     patch -p1 < "../../patches/0002-Enable-wireguard-by-default.patch"
-  popd
 
-  # hardcode kernelsu version (workaround a bug where it defaults to v16 and breaks manager app)
-  pushd KernelSU/
-    # determine kernelsu version
-    KSU_VERSION=$(($(git rev-list --count HEAD) + 10200))
+    # hardcode kernelsu version (workaround a bug where it defaults to v16 and breaks manager app)
+    pushd KernelSU/
+      # determine kernelsu version
+      KSU_VERSION=$(($(git rev-list --count HEAD) + 10200))
 
-    # hardcode kernelsu version
-    sed -i '1s/^/ccflags-y += -DKSU_VERSION='"${KSU_VERSION}"'\n/' kernel/Makefile
-  popd
+      # hardcode kernelsu version
+      sed -i '1s/^/ccflags-y += -DKSU_VERSION='"${KSU_VERSION}"'\n/' kernel/Makefile
+    popd # KernelSU/
+  popd # aosp/
 
   # build kernel
   ${KERNEL_BUILD_COMMAND}
@@ -206,7 +206,7 @@ pushd rom/
     openssl genrsa 4096 | openssl pkcs8 -topk8 -scrypt -out avb.pem -passout pass:""
     expect ../../../expect/passphrase-prompts.exp ../../external/avb/avbtool.py extract_public_key --key avb.pem --output avb_pkmd.bin
     ssh-keygen -t ed25519 -f id_ed25519 -N ""
-  popd
+  popd # keys/${DEVICE}/
 
   # encrypt keys
   expect ../expect/passphrase-prompts.exp ./script/encrypt-keys.sh "./keys/${DEVICE}"
@@ -219,7 +219,7 @@ pushd rom/
 
   # build release
   expect ../expect/passphrase-prompts.exp script/generate-release.sh "${DEVICE}" "${BUILD_NUMBER}"
-popd
+popd # rom/
 
 # Write output
 echo "The file you are likely looking for is:"
