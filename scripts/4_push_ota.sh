@@ -1,27 +1,7 @@
 #!/usr/bin/env bash
 
-AVBROOT_VERSION="3.10.0"
-CUSTOTA_TOOL_VERSION="5.4"
-export AVBROOT_VERSION CUSTOTA_TOOL_VERSION
-
-# install all apt dependencies
-apt update
-apt dist-upgrade -y
-apt install -y \
-  curl \
-  unzip
-
-# install avbroot
-curl -o /var/tmp/avbroot.zip -L "https://github.com/chenxiaolong/avbroot/releases/download/v${AVBROOT_VERSION}/avbroot-${AVBROOT_VERSION}-x86_64-unknown-linux-gnu.zip"
-unzip /var/tmp/avbroot.zip -d /usr/bin -x LICENSE README.md
-chmod +x /usr/bin/avbroot
-rm -f /var/tmp/avbroot.zip
-
-# install custota-tool
-curl -o /var/tmp/custota-tool.zip -L "https://github.com/chenxiaolong/Custota/releases/download/v${CUSTOTA_TOOL_VERSION}/custota-tool-${CUSTOTA_TOOL_VERSION}-x86_64-unknown-linux-gnu.zip"
-unzip /var/tmp/custota-tool.zip -d /usr/bin
-chmod +x /usr/bin/custota-tool
-rm -f /var/tmp/custota-tool.zip
+# execute setup container script
+. scripts/0_setup_container.sh
 
 # grab input variables
 DEVICE="${1}"

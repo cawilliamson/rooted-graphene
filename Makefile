@@ -15,7 +15,8 @@ all:
 	$(call check_web_dir)
 	$(MAKE) clean
 	$(MAKE) pull-repo
-	$(MAKE) build
+	$(MAKE) build-kernel
+	$(MAKE) build-rom
 	$(MAKE) push-ota
 	$(MAKE) clean
 
@@ -23,8 +24,8 @@ all:
 check_device = $(if $(DEVICE),,$(error DEVICE is required))
 check_web_dir = $(if $(WEB_DIR),,$(error WEB_DIR is required))
 
-# Build sources using Docker
-build:
+# Build kernel using Docker
+build-kernel:
 	$(call check_device)
 	docker run --rm \
 		--cpus="$(CPU_LIMIT)" \
@@ -32,7 +33,18 @@ build:
 		-v "$(PWD)":/src \
 		-w /src \
 		ubuntu:latest \
-		/bin/bash /src/scripts/1_build_sources.sh $(DEVICE) $(GRAPHENE_BRANCH)
+		/bin/bash /src/scripts/2_build_kernel.sh $(DEVICE) $(GRAPHENE_BRANCH)
+
+# Build rom using Docker
+build-rom:
+	$(call check_device)
+	docker run --rm \
+		--cpus="$(CPU_LIMIT)" \
+		--memory="$(MEM_LIMIT)" \
+		-v "$(PWD)":/src \
+		-w /src \
+		ubuntu:latest \
+		/bin/bash /src/scripts/3_build_rom.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Pull repo updates
 pull-repo:

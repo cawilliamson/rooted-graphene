@@ -1,102 +1,13 @@
 #!/usr/bin/env bash
 
-set -e
-
-# set variables
-PUP_VERSION="0.4.0"
-export PUP_VERSION
+# execute setup container script
+. scripts/0_setup_container.sh
 
 # include device-specific variables
 DEVICE="${1,,}"
-GRAPHENE_BRANCH="${2,,}"
 
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
-
-### FUNCTIONS
-
-# Function to run repo sync until successful
-function repo_sync_until_success() {
-  # disable exit on error - we expect this to fail a few times
-  set +e
-
-  # perform sync
-  # (using -j4 makes the sync less likely to hit rate limiting)
-  until repo sync -c -j4 --fail-fast --no-clone-bundle --no-tags; do
-    echo "repo sync failed, retrying in 1 minute..."
-    sleep 60
-  done
-
-  # re-enable exit on error - we're done failing now! :)
-  set -e
-}
-
-### SETUP BUILD SYSTEM
-
-# set apt to noninteractive mode
-export DEBIAN_FRONTEND=noninteractive
-
-# install all apt dependencies
-apt update
-apt dist-upgrade -y
-apt install -y \
-  bison \
-  build-essential \
-  curl \
-  expect \
-  flex \
-  git \
-  git-lfs \
-  jq \
-  libncurses-dev \
-  libssl-dev \
-  openjdk-21-jdk-headless \
-  python3 \
-  python3-googleapi \
-  python3-protobuf \
-  rsync \
-  ssh \
-  unzip \
-  yarnpkg \
-  zip
-
-# install pup command
-curl -o /var/tmp/pup.zip -L "https://github.com/ericchiang/pup/releases/download/v${PUP_VERSION}/pup_v${PUP_VERSION}_linux_amd64.zip"
-unzip /var/tmp/pup.zip -d /usr/bin
-chmod +x /usr/bin/pup
-rm -f /var/tmp/pup.zip
-
-# install repo command
-curl -s https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
-chmod +x /usr/bin/repo
-
-# install libncurses5
-pushd /var/tmp
-  curl -O http://launchpadlibrarian.net/648013231/libtinfo5_6.4-2_amd64.deb
-  dpkg -i libtinfo5_6.4-2_amd64.deb
-  curl -LO http://launchpadlibrarian.net/648013227/libncurses5_6.4-2_amd64.deb
-  dpkg -i libncurses5_6.4-2_amd64.deb
-  rm -f ./*.deb
-popd
-
-# configure git
-git config --global color.ui false
-git config --global user.email "androidbuild@localhost"
-git config --global user.name "Android Build"
-
-### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
-
-# determine tag
-GRAPHENE_RELEASE=$(curl -s https://grapheneos.org/releases | pup "tr#${DEVICE}-${GRAPHENE_BRANCH} td:nth-of-type(2) text{}")
-
-# Check if version has already been built
-if [ -f "${DEVICE}_latest.txt" ]; then
-  PREVIOUS_VERSION=$(cat "${DEVICE}_latest.txt")
-  if [ "${PREVIOUS_VERSION}" = "${GRAPHENE_RELEASE}" ]; then
-    echo "Version ${GRAPHENE_RELEASE} has already been built. Skipping..."
-    exit 1
-  fi
-fi
 
 ### BUILD KERNEL
 
@@ -143,6 +54,7 @@ pushd kernel/
       KSU_VERSION=$(($(git rev-list --count HEAD) + 10200))
 
       # hardcode kernelsu version
+      sed -i '/^ccflags-y += -DKSU_VERSION=/d' kernel/Makefile
       sed -i '1s/^/ccflags-y += -DKSU_VERSION='"${KSU_VERSION}"'\n/' kernel/Makefile
     popd # KernelSU/
   popd # aosp/
