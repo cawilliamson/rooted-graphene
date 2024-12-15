@@ -14,6 +14,7 @@ all:
 	$(call check_device)
 	$(call check_web_dir)
 	$(MAKE) clean
+	$(MAKE) check-versions
 	$(MAKE) pull-repo
 	$(MAKE) build-kernel
 	$(MAKE) build-rom
@@ -45,6 +46,14 @@ build-rom:
 		-w /src \
 		ubuntu:latest \
 		/bin/bash /src/scripts/3_build_rom.sh $(DEVICE) $(GRAPHENE_BRANCH)
+
+# Check versions
+check-versions:
+	docker run --rm \
+		-v "$(PWD)":/src \
+		-w /src \
+		ubuntu:latest \
+		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Pull repo updates
 pull-repo:
