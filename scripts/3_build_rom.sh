@@ -81,3 +81,6 @@ ls "rom/releases/${BUILD_NUMBER}/release-${DEVICE}-${BUILD_NUMBER}/${DEVICE}-ota
 
 # Update version check file
 echo "${GRAPHENE_RELEASE}" > "${DEVICE}_built.txt"
+
+# Remove building file
+rm -f "${DEVICE}_building.txt"
