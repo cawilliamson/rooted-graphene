@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 # set variables
-ENV PUP_VERSION="0.4.0" \
+ARG PUP_VERSION="0.4.0" \
     AVBROOT_VERSION="3.10.0" \
     CUSTOTA_TOOL_VERSION="5.4" \
     DEBIAN_FRONTEND=noninteractive
