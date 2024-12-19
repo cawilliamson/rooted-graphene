@@ -29,7 +29,8 @@ pushd kernel/ || exit
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
 
     # fetch susfs
-    git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
+    #git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
+    git clone --depth=1 "https://gitlab.com/chrisaw/susfs4ksu.git" -b "${SUSFS_BRANCH}"
 
     # apply susfs to kernelsu
     pushd KernelSU/ || exit
