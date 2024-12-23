@@ -29,8 +29,7 @@ pushd kernel/ || exit
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
 
     # fetch susfs
-    #git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
-    git clone --depth=1 "https://gitlab.com/chrisaw/susfs4ksu.git" -b "${SUSFS_BRANCH}"
+    git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
 
     # apply susfs to kernelsu
     pushd KernelSU/ || exit
@@ -48,6 +47,7 @@ pushd kernel/ || exit
     cp -v susfs4ksu/kernel_patches/include/linux/*.h include/linux/
 
     # enable wireguard by default
+    echo "Applying wireguard patches..."
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
     patch -p1 < "../../patches/0002-Enable-wireguard-by-default.patch"
 
