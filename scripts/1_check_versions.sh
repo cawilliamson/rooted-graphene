@@ -15,7 +15,6 @@ GRAPHENE_BRANCH="${2,,}"
 
 # determine tag
 GRAPHENE_RELEASE=$(curl -s https://grapheneos.org/releases | pup "tr#${DEVICE}-${GRAPHENE_BRANCH} td:nth-of-type(2) text{}")
-echo "${GRAPHENE_RELEASE}" > "${DEVICE}_building.txt"
 
 # Check if version has already been built
 if [ -f "${DEVICE}_built.txt" ]; then
@@ -25,3 +24,6 @@ if [ -f "${DEVICE}_built.txt" ]; then
     exit 1
   fi
 fi
+
+# write temp building file
+echo "${GRAPHENE_RELEASE}" > "${DEVICE}_building.txt"
