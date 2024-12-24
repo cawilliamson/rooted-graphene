@@ -27,7 +27,7 @@ check_web_dir = $(if $(WEB_DIR),,$(error WEB_DIR is required))
 
 # Build docker image
 build-docker-image:
-	docker build -t buildrom .
+	docker build --no-cache -t buildrom .
 
 # Build kernel using Docker
 build-kernel:
@@ -81,3 +81,4 @@ push-ota:
 # Clean build directories
 clean:
 	rm -rfv "*_building.txt" device_tmp/ kernel/ kernel_out/ rom/
+	docker rmi buildrom
