@@ -26,7 +26,7 @@ pushd kernel/ || exit
 
   # fetch & apply ksu and susfs patches
   pushd aosp/ || exit
-    # apply kernelsu
+    # apply kernelsu-next
     curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s "${KERNELSU_NEXT_BRANCH}"
 
     # hardcode kernelsu version (workaround a bug where it defaults to v16 and breaks manager app)
@@ -41,12 +41,6 @@ pushd kernel/ || exit
 
     # fetch susfs
     git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
-    # TODO: REMOVE!!
-    # simon broke susfs :(
-    pushd susfs4ksu/ || exit
-      git fetch --unshallow
-      git reset --hard 810ecfce1a1d5e71442506e80993786296a0b768
-    popd || exit # susfs4ksu/
 
     # apply susfs to kernel
     echo "Applying susfs for kernel..."
