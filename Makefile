@@ -81,4 +81,3 @@ push-ota:
 # Clean build directories
 clean:
 	rm -rfv "*_building.txt" device_tmp/ kernel/ kernel_out/ rom/
-	docker rmi buildrom
