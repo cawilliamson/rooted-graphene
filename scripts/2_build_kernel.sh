@@ -21,9 +21,10 @@ pushd kernel/ || exit
   repo_sync_until_success
 
   # remove abi_gki_protected_exports files
-  rm -f "common/android/abi_gki_protected_exports_*"
+  echo "Remove ABI GKI Protected Exports..."
+  rm -fv "common/android/abi_gki_protected_exports_*"
 
-  # fetch & apply ksu and \susfs patches
+  # fetch & apply ksu and susfs patches
   pushd aosp/ || exit
     # apply kernelsu
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
