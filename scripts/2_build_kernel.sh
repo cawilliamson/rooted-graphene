@@ -33,6 +33,7 @@ pushd kernel/ || exit
     # TODO: REMOVE!!
     # simon broke susfs :(
     pushd susfs4ksu/ || exit
+      git fetch --unshallow
       git reset --hard 810ecfce1a1d5e71442506e80993786296a0b768
     popd || exit # susfs4ksu/
 
