@@ -32,7 +32,9 @@ pushd kernel/ || exit
     git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
     # TODO: REMOVE!!
     # simon broke susfs :(
-    git reset --hard 810ecfce1a1d5e71442506e80993786296a0b768
+    pushd susfs4ksu/ || exit
+      git reset --hard 810ecfce1a1d5e71442506e80993786296a0b768
+    popd || exit # susfs4ksu/
 
     # apply susfs to kernelsu
     pushd KernelSU/ || exit
