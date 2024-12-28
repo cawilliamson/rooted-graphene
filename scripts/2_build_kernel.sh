@@ -26,8 +26,8 @@ pushd kernel/ || exit
 
   # fetch & apply ksu and susfs patches
   pushd aosp/ || exit
-    # apply kernelsu (5ec1cff magic mount fork)
-    curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | sed 's,tiann,5ec1cff,g' | bash -s
+    # apply kernelsu
+    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
 
     # hardcode kernelsu version (workaround a bug where it defaults to v16 and breaks manager app)
     pushd KernelSU/ || exit
