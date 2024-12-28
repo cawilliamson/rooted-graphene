@@ -26,21 +26,27 @@ pushd kernel/ || exit
 
   # fetch & apply ksu and susfs patches
   pushd aosp/ || exit
-    # apply kernelsu-next
-    curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s "${KERNELSU_NEXT_BRANCH}"
+    # apply kernelsu (5ec1cff magic mount fork)
+    curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | sed 's,tiann,5ec1cff,g' | bash -s
 
     # hardcode kernelsu version (workaround a bug where it defaults to v16 and breaks manager app)
-    pushd KernelSU-Next/ || exit
+    pushd KernelSU/ || exit
       # determine kernelsu version
       KSU_VERSION=$(($(git rev-list --count HEAD) + 10200))
 
       # hardcode kernelsu version
       sed -i '/^ccflags-y += -DKSU_VERSION=/d' kernel/Makefile
       sed -i '1s/^/ccflags-y += -DKSU_VERSION='"${KSU_VERSION}"'\n/' kernel/Makefile
-    popd || exit # KernelSU-Next/
+    popd || exit # KernelSU/
 
     # fetch susfs
     git clone --depth=1 "https://gitlab.com/simonpunk/susfs4ksu.git" -b "${SUSFS_BRANCH}"
+
+    # apply susfs to kernelsu
+    pushd KernelSU/ || exit
+      echo "Applying susfs for KernelSU..."
+      patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+    popd || exit
 
     # apply susfs to kernel
     echo "Applying susfs for kernel..."
