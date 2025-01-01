@@ -61,6 +61,9 @@ pushd kernel/ || exit
     echo "Applying wireguard patches..."
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
     patch -p1 < "../../patches/0002-Enable-wireguard-by-default.patch"
+
+    # remove "-dirty" suffix
+    patch -p1 < "../../patches/0003-Remove-dirty.patch"
   popd || exit # aosp/
 
   # build kernel
