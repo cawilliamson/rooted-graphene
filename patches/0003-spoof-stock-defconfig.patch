@@ -1,5 +1,5 @@
---- kernel/Makefile.orig	2025-01-01 22:25:06.978096395 +0000
-+++ kernel/Makefile	2025-01-01 22:25:57.043524221 +0000
+--- a/kernel/Makefile
++++ b/kernel/Makefile
 @@ -145,7 +145,7 @@
  
  filechk_cat = cat $<
