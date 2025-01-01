@@ -1,0 +1,11 @@
+--- kernel/Makefile.orig	2025-01-01 22:25:06.978096395 +0000
++++ kernel/Makefile	2025-01-01 22:25:57.043524221 +0000
+@@ -145,7 +145,7 @@
+ 
+ filechk_cat = cat $<
+ 
+-$(obj)/config_data: $(KCONFIG_CONFIG) FORCE
++$(obj)/config_data: arch/arm64/configs/stock_defconfig FORCE
+ 	$(call filechk,cat)
+ 
+ $(obj)/kheaders.o: $(obj)/kheaders_data.tar.xz

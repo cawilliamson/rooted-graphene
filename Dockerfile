@@ -19,6 +19,7 @@ RUN apt update && apt dist-upgrade -y && \
     jq \
     libncurses-dev \
     libssl-dev \
+    lz4 \
     openjdk-21-jdk-headless \
     python3 \
     python3-googleapi \

@@ -26,6 +26,12 @@ pushd kernel/ || exit
 
   # fetch & apply ksu and susfs patches
   pushd aosp/ || exit
+    # fetch stock defconfig to spoof
+    git clone --depth=1 --branch "${GRAPHENE_RELEASE}" --single-branch "${KERNEL_IMAGE_REPO}" kernel_image/
+    lz4 -d kernel_image/grapheneos/Image.lz4 kernel_image/Image
+    ./scripts/extract-ikconfig kernel_image/Image > arch/arm64/configs/stock_defconfig
+    rm -rf kernel_image/
+
     # apply kernelsu
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
 
@@ -62,8 +68,8 @@ pushd kernel/ || exit
     patch -p1 < "../../patches/0001-Disable-defconfig-check.patch"
     patch -p1 < "../../patches/0002-Enable-wireguard-by-default.patch"
 
-    # remove "-dirty" suffix
-    patch -p1 < "../../patches/0003-Remove-dirty.patch"
+    # spoof stock defconfig
+    patch -p1 < "../../patches/0003-spoof-stock-defconfig.patch"
   popd || exit # aosp/
 
   # build kernel
