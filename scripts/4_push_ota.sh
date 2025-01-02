@@ -36,6 +36,9 @@ avbroot ota patch \
   --rootless # we already prepatched in kernelsu
 
 echo "=== Publishing OTA Package ==="
+# remove old ota zip (if exists)
+echo "Removing old OTA zip (if exists)..."
+rm -fv "/web/${OTA_ZIP_NAME}"
 # move ota zip to web dir
 echo "Copying signed OTA to web directory..."
 cp -v "${OTA_ZIP_PATH}.patched" "/web/${OTA_ZIP_NAME}"
