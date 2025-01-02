@@ -34,6 +34,7 @@ pushd rom/ || exit
   echo "Copying kernel build artifacts..."
   # shellcheck disable=SC2010
   KERNEL_DIR=$(ls "device/google/${DEVICE_GROUP}-kernels/${KERNEL_VERSION}" | grep -v '.git')
+  rm -rf "device/google/${DEVICE_GROUP}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/*"
   cp -Rfv ../kernel_out/* "device/google/${DEVICE_GROUP}-kernels/${KERNEL_VERSION}/${KERNEL_DIR}/"
   rm -rf ../kernel_out
 
