@@ -45,7 +45,7 @@ pushd kernel/ || exit
 
     # apply kernelsu
     echo "Setting up KernelSU..."
-    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
+    curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
     # hardcode kernelsu version
     pushd KernelSU/ || exit
