@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# exit on error
 set -e
 
 # Function to run repo sync until successful

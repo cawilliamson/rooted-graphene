@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# exit on error
+set -e
+
 # include common functions
 # shellcheck disable=SC1091
 . "scripts/0_includes.sh"
