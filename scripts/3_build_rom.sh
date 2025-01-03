@@ -99,10 +99,9 @@ echo "Output file location:"
 ls "rom/releases/${BUILD_NUMBER}/release-${DEVICE}-${BUILD_NUMBER}/${DEVICE}-ota_update-${BUILD_NUMBER}.zip"
 
 echo "Updating version records..."
-# Update version check file
 echo "${GRAPHENE_RELEASE}" > "${DEVICE}_built.txt"
 
-# Remove building files
-rm -f "${DEVICE}_build_*.txt"
+echo "Deleting build markers..."
+rm -fv "${DEVICE}_build_*.txt"
 
 echo "=== Build Process Finished ==="
