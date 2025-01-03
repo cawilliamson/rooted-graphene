@@ -1,6 +1,7 @@
 .PHONY: all build clean push-ota
 
 # optional inputs for CPU and memory limits (defaults to 100% of available resources)
+BUILD_NUMBER_SUFFIX ?= 0
 GRAPHENE_BRANCH ?= stable
 KEYS_DIR ?= $(HOME)/.avbroot
 MAX_CPU_PERCENT ?= 100
@@ -38,7 +39,7 @@ build-kernel:
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
-		/bin/bash /src/scripts/2_build_kernel.sh $(DEVICE) $(GRAPHENE_BRANCH)
+		/bin/bash /src/scripts/2_build_kernel.sh $(DEVICE)
 
 # Build rom using Docker
 build-rom:
@@ -49,7 +50,7 @@ build-rom:
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
-		/bin/bash /src/scripts/3_build_rom.sh $(DEVICE) $(GRAPHENE_BRANCH)
+		/bin/bash /src/scripts/3_build_rom.sh $(DEVICE)
 
 # Check versions
 check-versions:
@@ -80,4 +81,4 @@ push-ota:
 
 # Clean build directories
 clean:
-	rm -rfv "*_building.txt" device_tmp/ kernel/ kernel_out/ rom/
+	rm -rfv "*_build_*.txt" device_tmp/ kernel/ kernel_out/ rom/

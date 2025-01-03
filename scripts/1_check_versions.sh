@@ -31,6 +31,7 @@ if [ -f "${DEVICE}_built.txt" ]; then
   echo "New version detected. Proceeding with build..."
 fi
 
-echo "Creating build marker for version ${GRAPHENE_RELEASE}..."
-# write temp building file
-echo "${GRAPHENE_RELEASE}" > "${DEVICE}_building.txt"
+echo "Creating build markers for version ${GRAPHENE_RELEASE}..."
+echo "${GRAPHENE_RELEASE}" > "${DEVICE}_build_release.txt"
+date +%s > "${DEVICE}_build_datetime.txt"
+echo "$(date +%Y%m%d).${BUILD_NUMBER_SUFFIX}" > "${DEVICE}_build_number.txt"

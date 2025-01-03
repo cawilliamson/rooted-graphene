@@ -8,8 +8,11 @@ set -e
 . "scripts/0_includes.sh"
 
 # include device-specific variables
+BUILD_DATETIME="$(cat "${DEVICE}_build_datetime.txt")"
+BUILD_NUMBER="$(cat "${DEVICE}_build_number.txt")"
 DEVICE="${1,,}"
-GRAPHENE_RELEASE="$(cat "${DEVICE}_building.txt")"
+GRAPHENE_RELEASE="$(cat "${DEVICE}_build_release.txt")"
+export BUILD_DATETIME BUILD_NUMBER
 
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
@@ -98,7 +101,7 @@ echo "Updating version records..."
 # Update version check file
 echo "${GRAPHENE_RELEASE}" > "${DEVICE}_built.txt"
 
-# Remove building file
-rm -f "${DEVICE}_building.txt"
+# Remove building files
+rm -f "${DEVICE}_build_*.txt"
 
 echo "=== Build Process Finished ==="
