@@ -58,7 +58,7 @@ check-versions:
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
-		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH)
+		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH) $(BUILD_NUMBER_SUFFIX)
 
 # Pull repo updates
 pull-repo:

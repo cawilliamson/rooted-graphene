@@ -9,6 +9,7 @@ set -e
 # include device-specific variables
 DEVICE="${1,,}"
 GRAPHENE_BRANCH="${2,,}"
+BUILD_NUMBER_SUFFIX="${3,,}"
 
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
