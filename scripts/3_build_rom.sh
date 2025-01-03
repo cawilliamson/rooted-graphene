@@ -102,6 +102,6 @@ echo "Updating version records..."
 echo "${GRAPHENE_RELEASE}" > "${DEVICE}_built.txt"
 
 echo "Deleting build markers..."
-rm -fv "${DEVICE}_build_*.txt"
+rm -fv "${DEVICE}"_build_*.txt
 
 echo "=== Build Process Finished ==="
