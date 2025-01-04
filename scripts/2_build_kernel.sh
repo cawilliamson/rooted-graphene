@@ -80,11 +80,8 @@ pushd kernel/ || exit
     echo "4. Applying 'wireguard by default' patch..."
     patch -p1 < "../../patches/0001-enable-wireguard-by-default.patch"
 
-    echo "5. Applying 'remove dirty' patch..."
-    patch -p1 < "../../patches/0002-remove-dirty.patch"
-
-    echo "6. Applying 'stock defconfig spoof' patch..."
-    patch -p1 < "../../patches/0003-spoof-stock-defconfig.patch"
+    echo "5. Applying 'stock defconfig spoof' patch..."
+    patch -p1 < "../../patches/0002-spoof-stock-defconfig.patch"
   popd || exit
 
   echo "=== Building Kernel ==="
