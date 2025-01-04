@@ -61,6 +61,7 @@ else
 fi
 
 echo "Creating build markers..."
+mkdir -p data/
 echo "${GRAPHENE_RELEASE}" > "data/${DEVICE}_build_release.txt"
 echo "${CURRENT_KSU_VERSION}" > "data/${DEVICE}_build_ksu.txt"
 echo "${CURRENT_SUSFS_COMMIT}" > "data/${DEVICE}_build_susfs.txt"
