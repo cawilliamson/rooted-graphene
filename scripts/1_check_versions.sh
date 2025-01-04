@@ -36,13 +36,7 @@ if [ -f "data/${DEVICE}_built.txt" ]; then
   PREVIOUS_GRAPHENE_VERSION=$(sed -n '1p' "data/${DEVICE}_built.txt")
   PREVIOUS_KSU_VERSION=$(sed -n '2p' "data/${DEVICE}_built.txt")
   PREVIOUS_SUSFS_COMMIT=$(sed -n '3p' "data/${DEVICE}_built.txt")
-  
-  echo "Found previous GrapheneOS version: ${PREVIOUS_GRAPHENE_VERSION}"
-  echo "Found previous KernelSU version: ${PREVIOUS_KSU_VERSION}"
-  echo "Current KernelSU version: ${CURRENT_KSU_VERSION}"
-  echo "Found previous SUSFS commit: ${PREVIOUS_SUSFS_COMMIT}"
-  echo "Current SUSFS commit: ${CURRENT_SUSFS_COMMIT}"
-  
+
   if [ "${PREVIOUS_GRAPHENE_VERSION}" = "${GRAPHENE_RELEASE}" ] && \
      [ "${PREVIOUS_KSU_VERSION}" = "${CURRENT_KSU_VERSION}" ] && \
      [ "${PREVIOUS_SUSFS_COMMIT}" = "${CURRENT_SUSFS_COMMIT}" ]; then
