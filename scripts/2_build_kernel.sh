@@ -78,7 +78,7 @@ pushd kernel/ || exit
     cp -v susfs4ksu/kernel_patches/include/linux/*.h include/linux/
 
     echo "4. Applying 'wireguard by default' patch..."
-    patch -p1 < "../../patches/0001-Enable-wireguard-by-default.patch"
+    patch -p1 < "../../patches/0001-enable-wireguard-by-default.patch"
 
     echo "5. Applying 'remove dirty' patch..."
     patch -p1 < "../../patches/0002-remove-dirty.patch"
