@@ -13,9 +13,9 @@ DEVICE="${1,,}"
 . "devices/${DEVICE}.sh"
 
 # import build markers
-BUILD_DATETIME="$(cat "${DEVICE}_build_datetime.txt")"
-BUILD_NUMBER="$(cat "${DEVICE}_build_number.txt")"
-GRAPHENE_RELEASE="$(cat "${DEVICE}_build_release.txt")"
+BUILD_DATETIME="$(cat "data/${DEVICE}_build_datetime.txt")"
+BUILD_NUMBER="$(cat "data/${DEVICE}_build_number.txt")"
+GRAPHENE_RELEASE="$(cat "data/${DEVICE}_build_release.txt")"
 export BUILD_DATETIME BUILD_NUMBER
 
 ### BUILD KERNEL

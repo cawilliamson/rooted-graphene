@@ -16,23 +16,53 @@ BUILD_NUMBER_SUFFIX="${3}"
 
 ### FETCH LATEST DEVICE-SPECIFIC GRAPHENE TAG
 
-# determine tag
+# fetch latest GrapheneOS release tag
 echo "Fetching latest GrapheneOS release for ${DEVICE} (${GRAPHENE_BRANCH})..."
 GRAPHENE_RELEASE=$(curl -s https://grapheneos.org/releases | pup "tr#${DEVICE}-${GRAPHENE_BRANCH} td:nth-of-type(2) text{}")
 echo "Latest release: ${GRAPHENE_RELEASE}"
 
-# Check if version has already been built
-if [ -f "${DEVICE}_built.txt" ]; then
-  PREVIOUS_VERSION=$(cat "${DEVICE}_built.txt")
-  echo "Found previous build version: ${PREVIOUS_VERSION}"
-  if [ "${PREVIOUS_VERSION}" = "${GRAPHENE_RELEASE}" ]; then
-    echo "Version ${GRAPHENE_RELEASE} has already been built. Skipping..."
+# fetch latest KernelSU release version
+echo "Fetching latest KernelSU release..."
+CURRENT_KSU_VERSION=$(curl -s https://api.github.com/repos/tiann/KernelSU/releases/latest | jq -r '.tag_name')
+echo "Latest KernelSU release: ${CURRENT_KSU_VERSION}"
+
+# fetch latest SUSFS commit
+echo "Fetching latest SUSFS commit..."
+CURRENT_SUSFS_COMMIT=$(git ls-remote https://gitlab.com/simonpunk/susfs4ksu.git refs/heads/"${SUSFS_BRANCH}" | cut -f1)
+echo "Latest SUSFS commit: ${CURRENT_SUSFS_COMMIT}"
+
+# check if version has already been built
+if [ -f "data/${DEVICE}_built.txt" ]; then
+  PREVIOUS_GRAPHENE_VERSION=$(sed -n '1p' "data/${DEVICE}_built.txt")
+  PREVIOUS_KSU_VERSION=$(sed -n '2p' "data/${DEVICE}_built.txt")
+  PREVIOUS_SUSFS_COMMIT=$(sed -n '3p' "data/${DEVICE}_built.txt")
+  
+  echo "Found previous GrapheneOS version: ${PREVIOUS_GRAPHENE_VERSION}"
+  echo "Found previous KernelSU version: ${PREVIOUS_KSU_VERSION}"
+  echo "Current KernelSU version: ${CURRENT_KSU_VERSION}"
+  echo "Found previous SUSFS commit: ${PREVIOUS_SUSFS_COMMIT}"
+  echo "Current SUSFS commit: ${CURRENT_SUSFS_COMMIT}"
+  
+  if [ "${PREVIOUS_GRAPHENE_VERSION}" = "${GRAPHENE_RELEASE}" ] && \
+     [ "${PREVIOUS_KSU_VERSION}" = "${CURRENT_KSU_VERSION}" ] && \
+     [ "${PREVIOUS_SUSFS_COMMIT}" = "${CURRENT_SUSFS_COMMIT}" ]; then
+    echo "GrapheneOS ${GRAPHENE_RELEASE}, KernelSU ${CURRENT_KSU_VERSION}, and SUSFS commit ${CURRENT_SUSFS_COMMIT} have already been built. Skipping..."
     exit 1
   fi
-  echo "New version detected. Proceeding with build..."
+
+  # Output what triggered the build
+  echo "Build triggered by:"
+  [ "${PREVIOUS_GRAPHENE_VERSION}" != "${GRAPHENE_RELEASE}" ] && echo "- GrapheneOS update: ${PREVIOUS_GRAPHENE_VERSION} -> ${GRAPHENE_RELEASE}"
+  [ "${PREVIOUS_KSU_VERSION}" != "${CURRENT_KSU_VERSION}" ] && echo "- KernelSU update: ${PREVIOUS_KSU_VERSION} -> ${CURRENT_KSU_VERSION}"
+  [ "${PREVIOUS_SUSFS_COMMIT}" != "${CURRENT_SUSFS_COMMIT}" ] && echo "- SUSFS update: ${PREVIOUS_SUSFS_COMMIT} -> ${CURRENT_SUSFS_COMMIT}"
+  echo "Proceeding with build..."
+else
+  echo "No previous build record found. Proceeding with build..."
 fi
 
-echo "Creating build markers for version ${GRAPHENE_RELEASE}..."
-echo "${GRAPHENE_RELEASE}" > "${DEVICE}_build_release.txt"
-date +%s > "${DEVICE}_build_datetime.txt"
-echo "$(date +%Y%m%d).${BUILD_NUMBER_SUFFIX}" > "${DEVICE}_build_number.txt"
+echo "Creating build markers..."
+echo "${GRAPHENE_RELEASE}" > "data/${DEVICE}_build_release.txt"
+echo "${CURRENT_KSU_VERSION}" > "data/${DEVICE}_build_ksu.txt"
+echo "${CURRENT_SUSFS_COMMIT}" > "data/${DEVICE}_build_susfs.txt"
+date +%s > "data/${DEVICE}_build_datetime.txt"
+echo "$(date +%Y%m%d).${BUILD_NUMBER_SUFFIX}" > "data/${DEVICE}_build_number.txt"

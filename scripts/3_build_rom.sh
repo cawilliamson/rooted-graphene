@@ -13,10 +13,12 @@ DEVICE="${1,,}"
 . "devices/${DEVICE}.sh"
 
 # import build markers
-BUILD_DATETIME="$(cat "${DEVICE}_build_datetime.txt")"
-BUILD_NUMBER="$(cat "${DEVICE}_build_number.txt")"
-GRAPHENE_RELEASE="$(cat "${DEVICE}_build_release.txt")"
-export BUILD_DATETIME BUILD_NUMBER
+BUILD_DATETIME="$(cat "data/${DEVICE}_build_datetime.txt")"
+BUILD_NUMBER="$(cat "data/${DEVICE}_build_number.txt")"
+GRAPHENE_RELEASE="$(cat "data/${DEVICE}_build_release.txt")"
+KSU_VERSION="$(cat "data/${DEVICE}_build_ksu.txt")"
+SUSFS_COMMIT="$(cat "data/${DEVICE}_build_susfs.txt")"
+export BUILD_DATETIME BUILD_NUMBER GRAPHENE_RELEASE KSU_VERSION SUSFS_COMMIT
 
 ### BUILD ROM
 
@@ -98,10 +100,10 @@ echo "=== Build Complete ==="
 echo "Output file location:"
 ls "rom/releases/${BUILD_NUMBER}/release-${DEVICE}-${BUILD_NUMBER}/${DEVICE}-ota_update-${BUILD_NUMBER}.zip"
 
-echo "Updating version records..."
-echo "${GRAPHENE_RELEASE}" > "${DEVICE}_built.txt"
+echo "Updating device build record..."
+printf "%s\n%s\n%s\n" "${GRAPHENE_RELEASE}" "${KSU_VERSION}" "${SUSFS_COMMIT}" > "data/${DEVICE}_built.txt"
 
 echo "Deleting build markers..."
-rm -fv "${DEVICE}"_build_*.txt
+rm -fv "data/${DEVICE}"_build_*.txt
 
 echo "=== Build Process Finished ==="
