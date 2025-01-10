@@ -24,7 +24,7 @@ echo "Latest release: ${GRAPHENE_RELEASE}"
 # fetch latest KernelSU release version
 echo "Fetching latest KernelSU commit..."
 CURRENT_KSU_COMMIT=$(git ls-remote https://github.com/tiann/KernelSU.git refs/heads/main | cut -f1)
-echo "Latest KernelSU release: ${CURRENT_KSU_COMMIT}"
+echo "Latest KernelSU commit: ${CURRENT_KSU_COMMIT}"
 
 # fetch latest SUSFS commit
 echo "Fetching latest SUSFS commit..."
@@ -40,7 +40,7 @@ if [ -f "data/${DEVICE}_built.txt" ]; then
   if [ "${PREVIOUS_GRAPHENE_VERSION}" = "${GRAPHENE_RELEASE}" ] && \
      [ "${PREVIOUS_KSU_COMMIT}" = "${CURRENT_KSU_COMMIT}" ] && \
      [ "${PREVIOUS_SUSFS_COMMIT}" = "${CURRENT_SUSFS_COMMIT}" ]; then
-    echo "GrapheneOS ${GRAPHENE_RELEASE}, KernelSU ${CURRENT_KSU_COMMIT}, and SUSFS commit ${CURRENT_SUSFS_COMMIT} have already been built. Skipping..."
+    echo "GrapheneOS ${GRAPHENE_RELEASE}, KernelSU commit ${CURRENT_KSU_COMMIT}, and SUSFS commit ${CURRENT_SUSFS_COMMIT} have already been built. Skipping..."
     exit 1
   fi
 
