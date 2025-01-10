@@ -9,7 +9,6 @@ set -e
 # include device-specific variables
 DEVICE="${1,,}"
 GRAPHENE_BRANCH="${2,,}"
-BUILD_NUMBER_SUFFIX="${3}"
 
 # shellcheck disable=SC1090
 . "devices/${DEVICE}.sh"
@@ -60,4 +59,4 @@ echo "${GRAPHENE_RELEASE}" > "data/${DEVICE}_build_graphene.txt"
 echo "${CURRENT_KSU_COMMIT}" > "data/${DEVICE}_build_ksu.txt"
 echo "${CURRENT_SUSFS_COMMIT}" > "data/${DEVICE}_build_susfs.txt"
 date +%s > "data/${DEVICE}_build_datetime.txt"
-echo "$(date +%Y%m%d).${BUILD_NUMBER_SUFFIX}" > "data/${DEVICE}_build_number.txt"
+echo "$(date +%Y%m%d).$(date +%H%M%S)" > "data/${DEVICE}_build_number.txt"

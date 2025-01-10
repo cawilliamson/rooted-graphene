@@ -1,7 +1,6 @@
 .PHONY: all build clean push-ota
 
 # optional inputs for CPU and memory limits (defaults to 100% of available resources)
-BUILD_NUMBER_SUFFIX ?= 0
 GRAPHENE_BRANCH ?= stable
 KEYS_DIR ?= $(HOME)/.avbroot
 MAX_CPU_PERCENT ?= 100
@@ -58,7 +57,7 @@ check-versions:
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
-		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH) $(BUILD_NUMBER_SUFFIX)
+		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH)
 
 # Pull repo updates
 pull-repo:
