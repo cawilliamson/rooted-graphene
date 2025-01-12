@@ -82,6 +82,9 @@ pushd kernel/ || exit
 
     echo "5. Applying 'stock defconfig spoof' patch..."
     patch -p1 < "../../patches/0002-spoof-stock-defconfig.patch"
+
+    echo "6. Applying 'clean kernel version' patch..."
+    patch -p1 < "../../patches/0003-clean-kernel-version.patch"
   popd || exit
 
   echo "=== Building Kernel ==="

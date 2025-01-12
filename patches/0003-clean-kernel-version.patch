@@ -1,0 +1,23 @@
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -104,7 +104,7 @@
+ 			git --no-optional-locks status -uno --porcelain 2>/dev/null ||
+ 			git diff-index --name-only HEAD
+ 		} | read dummy; then
+-			printf '%s' -dirty
++			printf '%s' ''
+ 		fi
+ 	fi
+ }
+@@ -166,8 +166,8 @@
+ fi
+ 
+ # finally, add the abXXX number if BUILD_NUMBER is set
+-if test -n "${BUILD_NUMBER}"; then
+-	res="$res-ab${BUILD_NUMBER}"
+-fi
++#if test -n "${BUILD_NUMBER}"; then
++#	res="$res-ab${BUILD_NUMBER}"
++#fi
+ 
+ echo "$res"
