@@ -10,8 +10,8 @@ Subject: [PATCH] Enable wireguard by default
 
 diff --git a/build.config.gki b/build.config.gki
 index 4b931d9eb..1bf34d3c5 100644
---- a/build.config.gki
-+++ b/build.config.gki
+--- a/aosp/build.config.gki
++++ b/aosp/build.config.gki
 @@ -1,2 +1,2 @@
  DEFCONFIG=gki_defconfig
 -POST_DEFCONFIG_CMDS="check_defconfig"
@@ -19,8 +19,8 @@ index 4b931d9eb..1bf34d3c5 100644
 
 diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
 index 72d85214e..736bbccdb 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
+--- a/aosp/drivers/net/Kconfig
++++ b/aosp/drivers/net/Kconfig
 @@ -73,6 +73,7 @@ config DUMMY
 
  config WIREGUARD

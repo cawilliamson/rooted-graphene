@@ -76,16 +76,16 @@ pushd kernel/ || exit
     echo "3. Copying SUSFS files to kernel..."
     cp -v susfs4ksu/kernel_patches/fs/*.c fs/
     cp -v susfs4ksu/kernel_patches/include/linux/*.h include/linux/
-
-    echo "4. Applying 'wireguard by default' patch..."
-    patch -p1 < "../../patches/0001-enable-wireguard-by-default.patch"
-
-    echo "5. Applying 'stock defconfig spoof' patch..."
-    patch -p1 < "../../patches/0002-spoof-stock-defconfig.patch"
-
-    echo "6. Applying 'clean kernel version' patch..."
-    patch -p1 < "../../patches/0003-clean-kernel-version.patch"
   popd || exit
+
+  echo "4. Applying 'wireguard by default' patch..."
+  patch -p1 < "../patches/0001-enable-wireguard-by-default.patch"
+
+  echo "5. Applying 'stock defconfig spoof' patch..."
+  patch -p1 < "../patches/0002-spoof-stock-defconfig.patch"
+
+  echo "6. Applying 'clean kernel version' patch..."
+  patch -p1 < "../patches/0003-clean-kernel-version.patch"
 
   echo "=== Building Kernel ==="
   # build kernel

@@ -1,23 +1,20 @@
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -104,7 +104,7 @@
- 			git --no-optional-locks status -uno --porcelain 2>/dev/null ||
- 			git diff-index --name-only HEAD
- 		} | read dummy; then
--			printf '%s' -dirty
-+			printf '%s' ''
- 		fi
- 	fi
- }
-@@ -166,8 +166,8 @@
- fi
+--- a/build/kernel/kleaf/workspace_status_stamp.py
++++ b/build/kernel/kleaf/workspace_status_stamp.py
+@@ -133,7 +133,7 @@
+             $GIT --no-optional-locks status -uno --porcelain 2>/dev/null ||
+             $GIT diff-index --name-only HEAD
+         } | read placeholder; then
+-            echo -n -dirty
++            echo -n ''
+         fi
+     """
+     popen = subprocess.Popen(script, shell=True, text=True,
+@@ -145,7 +145,7 @@
+         path=project,
+         popen=popen,
+         removed_prefix=None,
+-        suffix=suffix
++        suffix=""
+     )
  
- # finally, add the abXXX number if BUILD_NUMBER is set
--if test -n "${BUILD_NUMBER}"; then
--	res="$res-ab${BUILD_NUMBER}"
--fi
-+#if test -n "${BUILD_NUMBER}"; then
-+#	res="$res-ab${BUILD_NUMBER}"
-+#fi
  
- echo "$res"

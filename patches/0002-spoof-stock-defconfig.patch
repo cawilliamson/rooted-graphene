@@ -1,5 +1,5 @@
---- a/kernel/Makefile
-+++ b/kernel/Makefile
+--- a/aosp/kernel/Makefile
++++ b/aosp/kernel/Makefile
 @@ -145,7 +145,7 @@
  
  filechk_cat = cat $<
