@@ -65,27 +65,31 @@ pushd kernel/ || exit
 
     # apply patches
     echo "=== Applying Patches ==="
-    echo "1. Applying SUSFS to KernelSU..."
     pushd KernelSU/ || exit
+      echo "1. Applying SUSFS to KernelSU..."
       patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+
+      echo "2. Applying 'additional signatures' patch..."
+      patch -p1 < "../../patches/0001-add-managed-sigs.patch"
     popd || exit
 
-    echo "2. Applying SUSFS kernel patches..."
+    echo "3. Applying SUSFS kernel patches..."
     patch -p1 < "susfs4ksu/kernel_patches/${SUSFS_KERNEL_PATCH}"
 
     echo "3. Copying SUSFS files to kernel..."
     cp -v susfs4ksu/kernel_patches/fs/*.c fs/
     cp -v susfs4ksu/kernel_patches/include/linux/*.h include/linux/
+
   popd || exit
 
   echo "4. Applying 'wireguard by default' patch..."
-  patch -p1 < "../patches/0001-enable-wireguard-by-default.patch"
+  patch -p1 < "../patches/0002-enable-wireguard-by-default.patch"
 
   echo "5. Applying 'stock defconfig spoof' patch..."
-  patch -p1 < "../patches/0002-spoof-stock-defconfig.patch"
+  patch -p1 < "../patches/0003-spoof-stock-defconfig.patch"
 
   echo "6. Applying 'clean kernel version' patch..."
-  patch -p1 < "../patches/0003-clean-kernel-version.patch"
+  patch -p1 < "../patches/0004-clean-kernel-version.patch"
 
   echo "=== Building Kernel ==="
   # build kernel
