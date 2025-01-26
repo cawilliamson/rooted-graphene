@@ -70,7 +70,7 @@ pushd kernel/ || exit
       patch -p1 < "../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
 
       echo "2. Applying 'additional signatures' patch..."
-      patch -p1 < "../../patches/0001-add-managed-sigs.patch"
+      patch -p1 < "../../../patches/0001-add-managed-sigs.patch"
     popd || exit
 
     echo "3. Applying SUSFS kernel patches..."
