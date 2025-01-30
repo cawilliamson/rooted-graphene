@@ -22,8 +22,8 @@ echo "Latest release: ${GRAPHENE_RELEASE}"
 
 # fetch latest KernelSU release version
 echo "Fetching latest KernelSU commit..."
-CURRENT_KSU_COMMIT=$(git ls-remote https://github.com/tiann/KernelSU.git refs/heads/main | cut -f1)
-echo "Latest KernelSU commit: ${CURRENT_KSU_COMMIT}"
+CURRENT_KSU_VERSION=$(curl -s https://api.github.com/repos/tiann/KernelSU/releases/latest | jq -r '.tag_name')
+echo "Latest KernelSU version: ${CURRENT_KSU_VERSION}"
 
 # fetch latest SUSFS commit
 echo "Fetching latest SUSFS commit..."
@@ -33,20 +33,20 @@ echo "Latest SUSFS commit: ${CURRENT_SUSFS_COMMIT}"
 # check if version has already been built
 if [ -f "data/${DEVICE}_built.txt" ]; then
   PREVIOUS_GRAPHENE_VERSION=$(sed -n '1p' "data/${DEVICE}_built.txt")
-  PREVIOUS_KSU_COMMIT=$(sed -n '2p' "data/${DEVICE}_built.txt")
+  PREVIOUS_KSU_VERSION=$(sed -n '2p' "data/${DEVICE}_built.txt")
   PREVIOUS_SUSFS_COMMIT=$(sed -n '3p' "data/${DEVICE}_built.txt")
 
   if [ "${PREVIOUS_GRAPHENE_VERSION}" = "${GRAPHENE_RELEASE}" ] && \
-     [ "${PREVIOUS_KSU_COMMIT}" = "${CURRENT_KSU_COMMIT}" ] && \
+     [ "${PREVIOUS_KSU_VERSION}" = "${CURRENT_KSU_VERSION}" ] && \
      [ "${PREVIOUS_SUSFS_COMMIT}" = "${CURRENT_SUSFS_COMMIT}" ]; then
-    echo "GrapheneOS ${GRAPHENE_RELEASE}, KernelSU commit ${CURRENT_KSU_COMMIT}, and SUSFS commit ${CURRENT_SUSFS_COMMIT} have already been built. Skipping..."
+    echo "GrapheneOS ${GRAPHENE_RELEASE}, KernelSU commit ${CURRENT_KSU_VERSION}, and SUSFS commit ${CURRENT_SUSFS_COMMIT} have already been built. Skipping..."
     exit 1
   fi
 
   # Output what triggered the build
   echo "Build triggered by:"
   [ "${PREVIOUS_GRAPHENE_VERSION}" != "${GRAPHENE_RELEASE}" ] && echo "- GrapheneOS update: ${PREVIOUS_GRAPHENE_VERSION} -> ${GRAPHENE_RELEASE}"
-  [ "${PREVIOUS_KSU_COMMIT}" != "${CURRENT_KSU_COMMIT}" ] && echo "- KernelSU update: ${PREVIOUS_KSU_COMMIT} -> ${CURRENT_KSU_COMMIT}"
+  [ "${PREVIOUS_KSU_VERSION}" != "${CURRENT_KSU_VERSION}" ] && echo "- KernelSU update: ${PREVIOUS_KSU_VERSION} -> ${CURRENT_KSU_VERSION}"
   [ "${PREVIOUS_SUSFS_COMMIT}" != "${CURRENT_SUSFS_COMMIT}" ] && echo "- SUSFS update: ${PREVIOUS_SUSFS_COMMIT} -> ${CURRENT_SUSFS_COMMIT}"
   echo "Proceeding with build..."
 else
@@ -56,7 +56,7 @@ fi
 echo "Creating build markers..."
 mkdir -p data/
 echo "${GRAPHENE_RELEASE}" > "data/${DEVICE}_build_graphene.txt"
-echo "${CURRENT_KSU_COMMIT}" > "data/${DEVICE}_build_ksu.txt"
+echo "${CURRENT_KSU_VERSION}" > "data/${DEVICE}_build_ksu.txt"
 echo "${CURRENT_SUSFS_COMMIT}" > "data/${DEVICE}_build_susfs.txt"
 date +%s > "data/${DEVICE}_build_datetime.txt"
 echo "$(date +%Y%m%d).$(date +%H%M%S)" > "data/${DEVICE}_build_number.txt"
