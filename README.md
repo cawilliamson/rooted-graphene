@@ -1,7 +1,7 @@
 # Dependencies
 - avbroot
 - custota
-- Docker
+- podman
 
 # avbroot configuration
 - avbroot passwords are stored in `~/.avbroot/passwords.sh` as:
