@@ -2,8 +2,8 @@ FROM ubuntu:latest
 
 # set variables
 ARG PUP_VERSION="0.4.0" \
-    AVBROOT_VERSION="3.11.0" \
-    CUSTOTA_TOOL_VERSION="5.4" \
+    AVBROOT_VERSION="3.12.0" \
+    CUSTOTA_TOOL_VERSION="5.5" \
     DEBIAN_FRONTEND=noninteractive
 
 # install apt dependencies
