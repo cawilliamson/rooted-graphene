@@ -14,7 +14,7 @@ all:
 	$(call check_device)
 	$(call check_web_dir)
 	$(MAKE) clean
-	$(MAKE) build-docker-image
+	$(MAKE) build-podman-image
 	$(MAKE) check-versions
 	$(MAKE) pull-repo
 	$(MAKE) build-kernel
@@ -25,27 +25,29 @@ all:
 check_device = $(if $(DEVICE),,$(error DEVICE is required))
 check_web_dir = $(if $(WEB_DIR),,$(error WEB_DIR is required))
 
-# Build docker image
-build-docker-image:
-	docker build --no-cache -t buildrom .
+# Build podman image
+build-podman-image:
+	podman build --no-cache -t buildrom .
 
-# Build kernel using Docker
+# Build kernel using podman
 build-kernel:
 	$(call check_device)
-	docker run --rm \
+	podman run --rm \
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
+                --systemd=false \
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
 		/bin/bash /src/scripts/2_build_kernel.sh $(DEVICE)
 
-# Build rom using Docker
+# Build rom using podman
 build-rom:
 	$(call check_device)
-	docker run --rm \
+	podman run --rm \
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
+                --systemd=false \
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
@@ -53,7 +55,8 @@ build-rom:
 
 # Check versions
 check-versions:
-	docker run --rm \
+	podman run --rm \
+                --systemd=false \
 		-v "$(PWD)":/src \
 		-w /src \
 		buildrom \
@@ -68,9 +71,10 @@ pull-repo:
 push-ota:
 	$(call check_device)
 	$(call check_web_dir)
-	docker run --rm \
+	podman run --rm \
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
+                --systemd=false \
 		-v "$(PWD)":/src \
 		-v "$(KEYS_DIR)":/keys \
 		-v "$(WEB_DIR)":/web \
