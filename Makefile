@@ -36,7 +36,9 @@ build-kernel:
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
                 --systemd=false \
-		-v "$(PWD)":/src \
+                --ulimit nproc=16384:16384 \
+                --ulimit nofile=16384:16384 \
+		-v "$(PWD)":/src:Z \
 		-w /src \
 		buildrom \
 		/bin/bash /src/scripts/2_build_kernel.sh $(DEVICE)
@@ -48,7 +50,9 @@ build-rom:
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
                 --systemd=false \
-		-v "$(PWD)":/src \
+                --ulimit nproc=16384:16384 \
+                --ulimit nofile=16384:16384 \
+		-v "$(PWD)":/src:Z \
 		-w /src \
 		buildrom \
 		/bin/bash /src/scripts/3_build_rom.sh $(DEVICE)
@@ -57,7 +61,9 @@ build-rom:
 check-versions:
 	podman run --rm \
                 --systemd=false \
-		-v "$(PWD)":/src \
+		-v "$(PWD)":/src:Z \
+                --ulimit nproc=16384:16384 \
+                --ulimit nofile=16384:16384 \
 		-w /src \
 		buildrom \
 		/bin/bash /src/scripts/1_check_versions.sh $(DEVICE) $(GRAPHENE_BRANCH)
@@ -75,7 +81,9 @@ push-ota:
 		--cpus="$(CPU_LIMIT)" \
 		--memory="$(MEM_LIMIT)" \
                 --systemd=false \
-		-v "$(PWD)":/src \
+                --ulimit nproc=16384:16384 \
+                --ulimit nofile=16384:16384 \
+		-v "$(PWD)":/src:Z \
 		-v "$(KEYS_DIR)":/keys \
 		-v "$(WEB_DIR)":/web \
 		-w /src \
